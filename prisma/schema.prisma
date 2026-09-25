@@ -5,11 +5,89 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+model User {
+  id              Int     @id @default(autoincrement())
+  username        String  @unique
+  displayName     String?
+  email           String  @unique
+  profilePicture  String?
+
+  visited         Visited[]
+  wishlist        Wishlist[]
+  reviews         Reviews[]
+  lists           Lists[]
+}
+
+model Country {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  code    String  @unique
+  flag    String
+
+  visited   Visited[]
+  wishlist  Wishlist[]
+  reviews   Reviews[]
+  listItem  ListItem[]
+}
+
+model Visited {
+  userId    Int
+  countryId Int
+
+  user      User      @relation(fields: [userId], references: [id])
+  country   Country   @relation(fields: [countryId], references: [id])
+
+  @@id([userId, countryId])
+}
+
+model Wishlist {
+  userId    Int
+  countryId Int
+
+  user      User      @relation(fields: [userId], references: [id])
+  country   Country   @relation(fields: [countryId], references: [id])
+
+  @@id([userId, countryId])
+}
+
+model Reviews {
+  userId    Int
+  countryId Int
+  text      String
+  rating    Int
+
+  user      User      @relation(fields: [userId], references: [id])
+  country   Country   @relation(fields: [countryId], references: [id])
+
+  @@id([userId, countryId])
+}
+
+model Lists {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  name      String
+
+  user      User      @relation(fields: [userId], references: [id])
+
+  listItem  ListItem[]  
+}
+
+model ListItem {
+  listId    Int
+  countryId Int
+
+  lists      Lists    @relation(fields: [listId], references: [id])
+  country   Country   @relation(fields: [countryId], references: [id])
+
+  @@id([listId, countryId])
 }
