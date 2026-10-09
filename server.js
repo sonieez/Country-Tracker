@@ -1,9 +1,14 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import cors from 'cors';
 
 const PORT = 3000;
 const app = express();
 const prisma = new PrismaClient();
+
+app.use(cors({
+  origin: 'http://localhost:5173'
+}))
 
 app.get('/', (req, res) => {
   res.send("hello")
@@ -41,13 +46,13 @@ app.get('/countries/:code', async (req, res, next) => {
       res.status(400).json({message: 'Invalid code'});
       return;
     }
-    const countries = await prisma.country.findUnique({
+    const country = await prisma.country.findUnique({
       where: {
         code: code.toUpperCase(),
       }
     });
 
-    countries ? res.json(countries) : res.status(404).json({message: 'Not found'})
+    country ? res.json(country) : res.status(404).json({message: 'Not found'})
 
   } catch (error) {
     next(error);
