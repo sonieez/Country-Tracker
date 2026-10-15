@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
+import checkAuth from './src/middleware/auth.js';
 
 const PORT = 3000;
 const app = express();
@@ -57,6 +58,13 @@ app.get('/countries/:code', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+})
+
+app.get('/me', checkAuth, (req, res) => {
+  res.json({
+    id: req.user.id,
+    email: req.user.email,
+  })
 })
 
 app.use((err, req, res, next) => {
