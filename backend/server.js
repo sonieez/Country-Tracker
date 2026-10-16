@@ -60,11 +60,24 @@ app.get('/countries/:code', async (req, res, next) => {
   }
 })
 
-app.get('/me', checkAuth, (req, res) => {
-  res.json({
-    id: req.user.id,
-    email: req.user.email,
-  })
+app.get('/me', checkAuth, async (req, res, next) => {
+  try{
+    const user = await prisma.user.upsert({
+      where: {
+        id: req.user.id,
+      },
+      create: {
+        id: req.user.id,
+        email: req.user.email,
+        displayName: req.user.user_metadata.full_name,
+        profilePicture: req.user.user_metadata.picture,
+      },
+      update: {}
+    })
+    res.json(user)
+  } catch(error){
+    next(error);
+  }
 })
 
 app.use((err, req, res, next) => {

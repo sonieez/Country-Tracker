@@ -16,8 +16,8 @@ datasource db {
 
 
 model User {
-  id              Int     @id @default(autoincrement())
-  username        String  @unique
+  id              String  @id
+  username        String? @unique
   displayName     String?
   email           String  @unique
   profilePicture  String?
@@ -41,7 +41,7 @@ model Country {
 }
 
 model Visited {
-  userId    Int
+  userId    String
   countryId Int
 
   user      User      @relation(fields: [userId], references: [id])
@@ -51,7 +51,7 @@ model Visited {
 }
 
 model Wishlist {
-  userId    Int
+  userId    String
   countryId Int
 
   user      User      @relation(fields: [userId], references: [id])
@@ -61,7 +61,7 @@ model Wishlist {
 }
 
 model Reviews {
-  userId    Int
+  userId    String
   countryId Int
   text      String
   rating    Int
@@ -74,7 +74,7 @@ model Reviews {
 
 model Lists {
   id        Int       @id @default(autoincrement())
-  userId    Int
+  userId    String
   name      String
 
   user      User      @relation(fields: [userId], references: [id])
