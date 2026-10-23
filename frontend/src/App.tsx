@@ -1,48 +1,19 @@
-//import { useEffect } from 'react';
-import './App.css'
-import {supabase} from './lib/supabase'
+import { Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
+import Home from './pages/Home'
+import Country from './pages/Country'
+import Profile from './pages/Profile'
+import NotFound from './pages/NotFound'
 
-function App() {
-
-  async function authConnect(){
-    const result = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    })
-    if (result.error){
-      console.log(result.error);
-    }
-  }
-
-  // useEffect(() => {
-  //   async function getSession() {
-  //     const session = await supabase.auth.getSession()
-  //     console.log(session);
-  //   }
-  //   getSession();
-  // },[])
-  
-  async function testAuth(){
-    const result = await supabase.auth.getSession()
-    if (!result.data.session) {
-      return;
-    }
-    const accessToken = result.data.session.access_token;
-    const response = await fetch('http://localhost:3000/me', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    })
-    const data = await response.json();
-    console.log(data);
-    
-  }
-
-  return(
-    <>
-    <button onClick={authConnect}>Sign-in with Google</button>
-    <button onClick={testAuth}>Test /me</button>    
-    </>
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/countries/:code" element={<Country />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   )
 }
-
-export default App
