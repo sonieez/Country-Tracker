@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Layout() {
+  const { user, loading } = useAuth()
+  console.log(user, loading);
+
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('theme')
     if (saved) return saved === 'dark'
