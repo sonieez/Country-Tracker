@@ -3,8 +3,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Layout() {
-  const { user, loading } = useAuth()
-  console.log(user, loading);
+  const { user, loading, signIn, signOut } = useAuth()
 
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('theme')
@@ -36,7 +35,28 @@ export default function Layout() {
         >
           {dark ? '☀' : '☾'}
         </button>
-        <button className="fill">Sign in</button>
+        
+        {loading ? 
+          <span className="inline-block h-10 w-24" aria-hidden="true"></span> :
+            user ? 
+              <>
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user.displayName ?? user.email}
+                    referrerPolicy="no-referrer"
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-stamp font-bold">
+                    {(user.displayName ?? user.email)[0].toUpperCase()}
+                  </span>
+                )}
+                <button onClick={signOut} className="fill">Sign Out</button>
+              </> : 
+                <button onClick={signIn} className="fill">Sign in</button>
+        }
+
       </nav>
 
       <main>
