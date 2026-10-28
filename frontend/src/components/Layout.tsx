@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import SignInModal from './SignInModal'
 
 export default function Layout() {
-  const { user, loading, signIn, signOut } = useAuth()
+  const { user, loading, signIn, signOut, signInOpen, openSignIn, closeSignIn } = useAuth()
 
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('theme')
@@ -54,7 +55,7 @@ export default function Layout() {
                 )}
                 <button onClick={signOut} className="fill">Sign Out</button>
               </> : 
-                <button onClick={signIn} className="fill">Sign in</button>
+                <button onClick={openSignIn} className="fill">Sign in</button>
         }
 
       </nav>
@@ -67,6 +68,12 @@ export default function Layout() {
         <span>Every trip is a stamp · StampZ · 2026</span>
         <a href="#">About · Contact</a>
       </footer>
+      
+      <SignInModal
+        open={signInOpen}
+        onClose={closeSignIn}
+        onSignIn={signIn}
+      />
     </div>
   )
 }

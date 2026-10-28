@@ -17,6 +17,9 @@ type AuthContextValue = {
   loading: boolean
   signIn: () => Promise<void>
   signOut: () => Promise<void>
+  signInOpen: boolean
+  openSignIn: () => void
+  closeSignIn: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -26,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
   const [sessionChecked, setSessionChecked] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   useEffect(() => {
     async function loadSession() {
@@ -85,8 +89,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
   }
 
+  function openSignIn() {
+    setSignInOpen(true);
+  }
+
+  function closeSignIn() {
+    setSignInOpen(false);
+  }
+
   return (
-    <AuthContext.Provider value={{ session, user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user, loading, signIn, signOut, signInOpen, openSignIn, closeSignIn }}>
       {children}
     </AuthContext.Provider>
   )
