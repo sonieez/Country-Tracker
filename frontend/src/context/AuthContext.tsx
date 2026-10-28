@@ -15,6 +15,8 @@ type AuthContextValue = {
   session: Session | null
   user: AppUser | null
   loading: boolean
+  signIn: () => Promise<void>
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -23,12 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sessionChecked, setSessionChecked] = useState(false);
 
   useEffect(() => {
     async function loadSession() {
       const result = await supabase.auth.getSession();
       setSession(result.data.session);
-      setLoading(false);
+      setSessionChecked(true);
     }
     loadSession();
 
@@ -46,22 +49,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId) {
       setUser(null);
+      if (sessionChecked) {
+        setLoading(false);
+      }
       return;
     }
 
     async function loadUser() {
       try{
-        const user = await api('/me');        
-        setUser(user);
+        const meData = await api('/me');        
+        setUser(meData);
+        
       } catch(error) {
         console.error(error);
+
+      } finally {
+        setLoading(false);
       }
     }
     loadUser();
-  }, [userId])
+  }, [userId, sessionChecked])
+
+  async function signIn() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+
+    if (error) {
+      console.error(error);
+    }
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut()
+  }
 
   return (
-    <AuthContext.Provider value={{ session, user, loading }}>
+    <AuthContext.Provider value={{ session, user, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )
