@@ -24,7 +24,7 @@ export default function Layout() {
         <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
           <span className="ring"></span>StampZ
         </Link>
-        <NavLink to="/countries/FR" className={({ isActive }) => (isActive ? 'on' : '')}>
+        <NavLink to="/countries" className={({ isActive }) => (isActive ? 'on' : '')}>
           Countries
         </NavLink>
         <span className="sp"></span>
