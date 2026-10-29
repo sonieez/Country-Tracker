@@ -16,23 +16,33 @@ export default function Countries() {
   const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
+    let oldRequest = false;
+
     async function getCountries() {
       try{
         setError(null);
         const trimmed = searchInput.trim()
-        const path = trimmed ? `/countries?search=${encodeURIComponent(trimmed)}` : '/countries'
-        setCountries(await api(path));
+        const path = trimmed ? `/countries?search=${encodeURIComponent(trimmed)}` : '/countries';
+        const data = await api(path);
+        if (!oldRequest) {
+          setCountries(data);
+        }
       } catch (err) {
-        if (err instanceof Error){
-          setError(err.message);
-        } else {
-          setError("Something went wrong")
+        if (!oldRequest) {  
+          if (err instanceof Error){
+            setError(err.message);
+          } else {
+            setError("Something went wrong")
+          }
         }
       } finally {
-        setLoading(false);
+        if (!oldRequest) {
+          setLoading(false);
+        }
       }
     }
     getCountries();
+    return () => {oldRequest = true;}
   }, [searchInput])
 
   return(
