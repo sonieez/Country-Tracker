@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 
 type Country = {
@@ -52,8 +53,10 @@ export default function Countries() {
         <ul>
           {countries.map((c) => (
             <li key={c.code}>
-              <img src={c.flag} alt={c.name} />
-              <span>{c.name}</span>
+              <Link to={`/countries/${c.code}`}>
+                <img src={c.flag} alt={c.name} />
+                <span>{c.name}</span>
+              </Link>
             </li>
           ))}
         </ul>}
