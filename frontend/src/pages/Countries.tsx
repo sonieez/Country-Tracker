@@ -46,20 +46,33 @@ export default function Countries() {
     return () => {oldRequest = true;}
   }, [searchInput])
 
-  return(
+    return (
     <>
-      <input placeholder="Search countries..." type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
-      {loading ? <p>Loading...</p> : error ? <p>{error}</p> : 
-        <ul>
+      <h2 className="s">Countries</h2>
+      <input
+        className="search"
+        placeholder="Search countries..."
+        type="text"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+      />
+      {loading ? <p>Loading...</p> : error ? <p>{error}</p> :
+        <div className="grid4" style={{ marginTop: 16 }}>
           {countries.map((c) => (
-            <li key={c.code}>
-              <Link to={`/countries/${c.code}`}>
-                <img src={c.flag} alt={c.name} />
-                <span>{c.name}</span>
-              </Link>
-            </li>
+            <Link
+              key={c.code}
+              to={`/countries/${c.code}`}
+              className="box cc block"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <img className="f w-full object-cover" src={c.flag} alt={c.name} />
+              <div className="t">
+                <b>{c.name}</b>
+                <small>{c.code} · <span className="rate">– / 5</span></small>
+              </div>
+            </Link>
           ))}
-        </ul>}
+        </div>}
     </>
   )
 }

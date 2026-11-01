@@ -214,6 +214,8 @@
   .sg>div:nth-child(odd) .stamp{transform:rotate(-7deg)}
   .sg>div:nth-child(even) .stamp{transform:rotate(5deg)}
   .cc:hover{box-shadow:0 8px 0 color-mix(in srgb,var(--stamp) 35%,transparent)}
+  .search{width:100%;max-width:420px;padding:10px 16px;border:1.5px solid var(--line);border-radius:99px;background:var(--card);color:var(--text);font:400 14px Roboto,system-ui,sans-serif;margin-top:4px}
+  .search:focus-visible{outline:3px solid var(--wt);outline-offset:2px}
 
   @media(max-width:720px){
     .hero{grid-template-columns:1fr;padding:28px 22px}
