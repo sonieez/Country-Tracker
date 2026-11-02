@@ -234,6 +234,12 @@
   .tk .stub::after{bottom:-11px;clip-path:inset(0 0 50% 0)}
   .tk .cap{font-size:11px;color:var(--muted)}
   .tk .stamp{position:relative;z-index:2}
+  .tb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 16px}
+  .tb .search{flex:1 1 220px;max-width:none;margin-top:0}
+  .seg2{display:inline-flex;border:1.5px solid var(--line);border-radius:99px;overflow:hidden;background:var(--card)}
+  .seg2 button{border:0;border-radius:0;min-height:40px;display:inline-flex;align-items:center;gap:8px}
+  .seg2 button.sel{background:var(--btn);color:var(--btn-ink)}
+  .pick{min-height:44px;padding:0 16px;border:1.5px solid var(--line);border-radius:99px;background:var(--card);color:var(--head);font:500 13px Roboto,system-ui,sans-serif;cursor:pointer}
   .tk.big{grid-template-columns:190px minmax(0,1fr) 180px;min-height:200px}
   .tk.big .cd{font-size:40px}
   .tk.big .stamp{width:96px;height:96px;font-size:17px;border-width:4px}
