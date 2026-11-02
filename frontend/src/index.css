@@ -114,9 +114,7 @@
   }
 }
 
-/* 5. Prototype component classes */
-@layer components {
-  /* 5. Prototype component classes */
+/* 5. Component classes */
 @layer components {
   .wrap{max-width:1040px;margin:0 auto;padding:16px}
   .box{background:var(--card);border:1.5px solid var(--line);border-radius:20px;box-shadow:0 4px 0 color-mix(in srgb,var(--line) 22%,transparent)}
@@ -135,14 +133,16 @@
   .pass{background:var(--bg);border:6px solid var(--btn);border-radius:12px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;transform:rotate(-4deg);box-shadow:8px 8px 0 var(--soft)}
   .pass .l i{display:block;height:8px;border-radius:4px;background:var(--soft);margin:10px 0}
   .pass .r{display:grid;grid-template-columns:1fr 1fr;gap:8px;border-left:1.5px dashed var(--muted);padding-left:14px;place-items:center}
-  .stamp{width:78px;height:78px;border-radius:50%;border:4px solid var(--stamp);display:grid;place-items:center;position:relative;color:var(--stamp);font:700 14px Roboto;cursor:pointer;background:none;padding:0}
-  .stamp::after{content:"";position:absolute;inset:5px;border:1.5px solid var(--stamp);border-radius:50%}
-  .stamp.wish{border:2px dashed var(--wt);color:var(--wt);background:var(--wb);opacity:.85}
-  .stamp.wish::after{display:none}
-  .stamp.add{border:2px dashed var(--muted);color:var(--muted);font-size:24px;font-weight:400}
+
+  /* Stamp (one definition: visited / wish / add) */
+  .stamp{width:56px;height:56px;border-radius:50%;border:3px solid var(--stamp);display:grid;place-items:center;position:relative;color:var(--stamp);font:700 12px Roboto,sans-serif;cursor:pointer;background:none;padding:0}
+  .stamp::after{content:"";position:absolute;inset:3px;border:1.5px solid var(--stamp);border-radius:50%}
+  .stamp.wish{opacity:.42;border-style:dashed}
+  .stamp.add{border:2px dashed var(--muted);color:var(--muted);font-size:22px;font-weight:400}
   .stamp.add::after{display:none}
   .stamp.sm{width:56px;height:56px;font-size:11px;pointer-events:none}
   .pass .stamp{width:62px;height:62px;pointer-events:none}
+
   h2.s{font-size:22px;margin:32px 0 12px}
   .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
   .cc{overflow:hidden;cursor:pointer}
@@ -217,10 +217,36 @@
   .search{width:100%;max-width:420px;padding:10px 16px;border:1.5px solid var(--line);border-radius:99px;background:var(--card);color:var(--text);font:400 14px Roboto,system-ui,sans-serif;margin-top:4px}
   .search:focus-visible{outline:3px solid var(--wt);outline-offset:2px}
 
+  /* Ticket card (boarding pass) */
+  .tks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .tk{display:grid;grid-template-columns:104px minmax(0,1fr) 112px;position:relative;min-height:116px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 4px 0 color-mix(in srgb,var(--line) 22%,transparent);color:var(--text)}
+  .tk .fb{border-radius:14px 0 0 14px;border-right:1.5px solid var(--line);overflow:hidden}
+  .tk .fb img{width:100%;height:100%;object-fit:cover;display:block}
+  .tk .mid{padding:14px 16px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
+  .tk .tg{font-size:10px;letter-spacing:.2em;color:var(--muted)}
+  .tk .cd{font:700 28px/1.1 'Noto Serif',serif;color:var(--head);letter-spacing:.04em}
+  .tk .nm{font:500 16px 'Noto Serif',serif;color:var(--head);text-decoration:none}
+  .tk .nm::after{content:"";position:absolute;inset:0;border-radius:16px}
+  .tk .rate{font-size:12px;color:var(--wt);font-weight:500}
+  .tk .stub{position:relative;border-left:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px}
+  .tk .stub::before,.tk .stub::after{content:"";position:absolute;left:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line)}
+  .tk .stub::before{top:-11px;clip-path:inset(50% 0 0 0)}
+  .tk .stub::after{bottom:-11px;clip-path:inset(0 0 50% 0)}
+  .tk .cap{font-size:11px;color:var(--muted)}
+  .tk .stamp{position:relative;z-index:2}
+  .tk.big{grid-template-columns:190px minmax(0,1fr) 180px;min-height:200px}
+  .tk.big .cd{font-size:40px}
+  .tk.big .stamp{width:96px;height:96px;font-size:17px;border-width:4px}
+  .tk.big .stamp::after{inset:5px}
+  .tk.big .stamp.add{font-size:30px}
+
   @media(max-width:720px){
     .hero{grid-template-columns:1fr;padding:28px 22px}
     .ch,.two,.ch .a{grid-template-columns:1fr}
     .ch .a>div:first-child{border-right:0;border-bottom:1.5px dashed var(--line)}
+    .tks{grid-template-columns:1fr}
+    .tk{grid-template-columns:80px minmax(0,1fr) 100px}
+    .tk.big{grid-template-columns:110px minmax(0,1fr) 120px}
   }
   @media(prefers-reduced-motion:no-preference){
     .pass{transition:transform .3s}
@@ -229,6 +255,7 @@
     .cc:hover{transform:translateY(-4px)}
     .sg .stamp:hover{transform:rotate(0) scale(1.1)}
     button:active{transform:scale(.96)}
+    .tk{transition:transform .2s}
+    .tk:hover{transform:translateY(-3px)}
   }
-}
 }

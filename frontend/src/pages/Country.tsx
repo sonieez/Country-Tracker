@@ -48,22 +48,23 @@ export default function CountryPage() {
 
   return (
     loading ? <p>Loading...</p> : error ? <p>{error}</p> : !country ? "Country not found" : 
-            <div className="ch">
-        <section className="box a">
-          <div>
-            <img className="flag object-cover" src={country.flag} alt={country.name} />
-            <div>
-              <span className="code">{country.code}</span>
-              <h1>{country.name}</h1>
-            </div>
+      <div className="ch">
+        <section className="tk big">
+          <div className="fb">
+            <img src={country.flag} alt={`Flag of ${country.name}`} />
           </div>
-          <div>
-            <div>
-              <span className="stamp add" style={{ margin: '0 auto 6px' }}>+</span>
-              Stamp it
-            </div>
+          <div className="mid">
+            <span className="tg">COUNTRY PASS</span>
+            <span className="cd">{country.code}</span>
+            <h1>{country.name}</h1>
+            <span className="rate">– / 5</span>
+          </div>
+          <div className="stub">
+            <button className="stamp add" aria-label={`Stamp ${country.name}`}>+</button>
+            <span className="cap">Stamp it</span>
           </div>
         </section>
+
         <section className="box stats">
           <div><span>Rating</span><b className="r">– / 5</b></div>
           <div><span>Visited by</span><b>–</b></div>

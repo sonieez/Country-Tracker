@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
+import TicketCard from "../components/TicketCard";
 
 type Country = {
   id: number
@@ -57,20 +58,9 @@ export default function Countries() {
         onChange={(e) => setSearchInput(e.target.value)}
       />
       {loading ? <p>Loading...</p> : error ? <p>{error}</p> :
-        <div className="grid4" style={{ marginTop: 16 }}>
+        <div className="tks" style={{ marginTop: 16 }}>
           {countries.map((c) => (
-            <Link
-              key={c.code}
-              to={`/countries/${c.code}`}
-              className="box cc block"
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <img className="f w-full object-cover" src={c.flag} alt={c.name} />
-              <div className="t">
-                <b>{c.name}</b>
-                <small>{c.code} · <span className="rate">– / 5</span></small>
-              </div>
-            </Link>
+            <TicketCard key={c.id} country={c} />
           ))}
         </div>}
     </>
