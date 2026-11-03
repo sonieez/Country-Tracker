@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { api } from "../lib/api";
 import TicketCard from "../components/TicketCard";
+import WorldMap from "../components/WorldMap";
 
 type Country = {
   id: number
@@ -17,6 +18,7 @@ export default function Countries() {
   const [searchInput, setSearchInput] = useState("");
   const [sort, setSort] = useState<"az" | "za">('az');
   const [view, setView] = useState<"list" | "map">("list");
+  const [activeCode, setActiveCode] = useState<string | null>(null);
 
   useEffect(() => {
     let oldRequest = false;
@@ -55,6 +57,8 @@ export default function Countries() {
     return b.name.localeCompare(a.name)
   });
 
+  const activeCountry  = countries.find((c) => c.code === activeCode);
+
   return (
     <>
       <h2 className="s">Countries</h2>
@@ -74,14 +78,14 @@ export default function Countries() {
 
       <select className="pick" aria-label="Filter">
         <option value="all">Filter: All</option>
-        <option value="visited">Visited</option>
-        <option value="wishlist">Wishlist</option>
-        <option value="none">Not stamped</option>
+        <option value="visited">Filter: Visited</option>
+        <option value="wishlist">Filter: Wishlist</option>
+        <option value="none">Filter: Not stamped</option>
       </select>
 
       <select value={sort} className="pick" aria-label="Sort" onChange={(e) => setSort(e.target.value as "az" | "za")}>
         <option value="az">Sort: A–Z</option>
-        <option value="za">Z–A</option>
+        <option value="za">Sort: Z–A</option>
       </select>
       </div>
 
@@ -92,7 +96,12 @@ export default function Countries() {
             <TicketCard key={c.id} country={c} />
           ))}
         </div> :
-        <p>Map coming soon</p>
+        <div className="mapw">
+          <WorldMap activeCode={activeCode} onSelect={setActiveCode} />
+          <aside className="box side">
+            {activeCountry ? <TicketCard country={activeCountry} /> : <small>Hover a country to preview it.</small>}
+          </aside>
+        </div>
       }
     </>
   )

@@ -246,6 +246,17 @@
   .tk.big .stamp::after{inset:5px}
   .tk.big .stamp.add{font-size:30px}
 
+  /* Map */
+  .mapbox{overflow:hidden;padding:0}
+  .mapbox svg{display:block;width:100%;height:auto}
+  .land{fill:var(--soft);stroke:var(--line);stroke-width:.4;outline:none;transition:fill .15s}
+  .land:hover{fill:var(--stamp);fill-opacity:.35;cursor:pointer}
+  .mapw{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-top:16px;align-items:start}
+  .mapw .side{padding:18px;display:flex;flex-direction:column;gap:14px}
+  .mapw .side small{color:var(--muted)}
+  .land.act{fill:var(--stamp);fill-opacity:.55}
+  @media(max-width:720px){.mapw{grid-template-columns:1fr}}
+
   @media(max-width:720px){
     .hero{grid-template-columns:1fr;padding:28px 22px}
     .ch,.two,.ch .a{grid-template-columns:1fr}
