@@ -7,6 +7,8 @@ const PORT = 3000;
 const app = express();
 const prisma = new PrismaClient();
 
+app.use(express.json());
+
 app.use(cors({
   origin: 'http://localhost:5173'
 }))
@@ -60,6 +62,57 @@ app.get('/countries/:code', async (req, res, next) => {
   }
 })
 
+app.put('/countries/:code/stamp', checkAuth, async(req, res, next) =>{
+  try{
+    let code = req.params.code;
+    const status = req.body.status;
+    const userId = req.user.id;
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      res.status(400).json({message: "Invalid code"});
+      return;
+    }
+    code = code.toUpperCase();
+    if (!["visited", "wishlist", "none"].includes(status)){
+      res.status(400).json({message: "Invalid status"});
+      return;
+    }
+    const country = await prisma.country.findUnique({where: { code }});
+    if (!country) {
+      res.status(404).json({message: "Not found"});
+      return;
+    } 
+    const countryId = country.id;
+    if (status === "visited") {
+      await prisma.$transaction([
+        prisma.wishlist.deleteMany({ where: {userId, countryId } }),
+        prisma.visited.upsert({
+          where: {userId_countryId: {userId, countryId}},
+          create: {userId, countryId},
+          update: {},
+        }),
+      ]);
+    } else if (status === "wishlist") {
+      await prisma.$transaction([
+        prisma.visited.deleteMany({ where: { userId, countryId } }),
+        prisma.wishlist.upsert({
+          where: {userId_countryId: {userId, countryId}},
+          create: {userId, countryId},
+          update: {},
+        }),
+      ]);
+    } else {
+      await prisma.$transaction([
+        prisma.wishlist.deleteMany({where: {userId, countryId}}),
+        prisma.visited.deleteMany({where: {userId, countryId}})
+      ])
+    }
+    res.json({ code, status });
+
+  } catch(error) {
+    next(error);
+  }
+})
+
 app.get('/me', checkAuth, async (req, res, next) => {
   try{
     const user = await prisma.user.upsert({
@@ -79,6 +132,7 @@ app.get('/me', checkAuth, async (req, res, next) => {
     next(error);
   }
 })
+
 
 app.use((err, req, res, next) => {
   console.error(err);
