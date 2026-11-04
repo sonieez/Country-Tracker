@@ -247,10 +247,12 @@
   .tk.big .stamp.add{font-size:30px}
 
   /* Map */
-  .mapbox{overflow:hidden;padding:0}
+  .mapbox{position:relative;overflow:hidden;padding:0}
   .mapbox svg{display:block;width:100%;height:auto}
-  .land{fill:var(--soft);stroke:var(--line);stroke-width:.4;outline:none;transition:fill .15s}
+  .land{fill:var(--soft);stroke:var(--line);stroke-width:.4;outline:none;transition:fill .15s;vector-effect:non-scaling-stroke}
   .land:hover{fill:var(--stamp);fill-opacity:.35;cursor:pointer}
+  .zoomctl{position:absolute;top:12px;right:12px;z-index:2;display:flex;flex-direction:column;gap:6px}
+  .zoomctl button{width:40px;height:40px;padding:0;border-radius:50%;background:var(--card);font-size:20px;line-height:1}
   .mapw{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-top:16px;align-items:start}
   .mapw .side{padding:18px;display:flex;flex-direction:column;gap:14px}
   .mapw .side small{color:var(--muted)}
