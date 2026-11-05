@@ -133,6 +133,28 @@ app.get('/me', checkAuth, async (req, res, next) => {
   }
 })
 
+app.get('/me/stamps', checkAuth, async (req,res,next) => {
+  try{
+    const userId = req.user.id;
+    const [visitedCountries, wishlistCountries] = await Promise.all([
+      prisma.visited.findMany({
+        where: {userId},
+        include: { country: true },
+      }),
+      prisma.wishlist.findMany({
+        where: {userId},
+        include: { country: true },
+      })
+    ]);
+    res.json({
+      visited: visitedCountries.map((v) => v.country.code), 
+      wishlist: wishlistCountries.map((w) => w.country.code)
+    })
+  } catch (error) {
+    next(error);
+  }
+})
+
 
 app.use((err, req, res, next) => {
   console.error(err);
