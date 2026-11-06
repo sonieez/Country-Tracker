@@ -6,11 +6,13 @@ export async function api(path: string, options: RequestInit = {}) {
   const result = await supabase.auth.getSession();
   const accessToken = result.data.session?.access_token;
 
+  const mergedHeaders = new Headers(options.headers);
+  if (accessToken) {
+    mergedHeaders.set('Authorization', `Bearer ${accessToken}`)
+  }
   const response = await fetch(`${API_URL}${path}`, 
     { ...options, 
-      headers: accessToken ? { 
-        Authorization: `Bearer ${accessToken}`
-      } : {}
+      headers: mergedHeaders
     }
   );
   
