@@ -276,5 +276,8 @@
     button:active{transform:scale(.96)}
     .tk{transition:transform .2s}
     .tk:hover{transform:translateY(-3px)}
+    .stamp{transition:transform .15s ease,opacity .2s,border-color .2s,color .2s}
+    .stamp:active{transform:scale(.85) rotate(-8deg)}
   }
+
 }

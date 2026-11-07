@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import StampButton from "./StampButton";
 
 type Country = { id: number; name: string; code: string; flag: string };
 
@@ -15,8 +16,7 @@ export default function TicketCard({ country }: { country: Country }) {
         <span className="rate">– / 5</span>
       </div>
       <div className="stub">
-        <button className="stamp add" aria-label={`Stamp ${country.name}`}>+</button>
-        <span className="cap">Stamp it</span>
+        <StampButton code={country.code} name={country.name} />
       </div>
     </article>
   );

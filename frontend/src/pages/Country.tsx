@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
+import StampButton from '../components/StampButton'
 
 type Country = {
   id: number
@@ -60,8 +61,7 @@ export default function CountryPage() {
             <span className="rate">– / 5</span>
           </div>
           <div className="stub">
-            <button className="stamp add" aria-label={`Stamp ${country.name}`}>+</button>
-            <span className="cap">Stamp it</span>
+            <StampButton code={country.code} name={country.name} />
           </div>
         </section>
 
