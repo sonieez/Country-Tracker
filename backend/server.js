@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 app.use(express.json());
 
 app.use(cors({
-  origin: 'http://localhost:5173'
+  origin: ['http://localhost:5173', 'https://stampz-project.vercel.app']
 }))
 
 app.get('/', (req, res) => {
