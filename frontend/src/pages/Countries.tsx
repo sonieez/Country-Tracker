@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { api } from "../lib/api";
 import TicketCard from "../components/TicketCard";
 import WorldMap from "../components/WorldMap";
+import { useStamps } from "../context/StampsContext";
 
 type Country = {
   id: number
@@ -11,7 +12,7 @@ type Country = {
 }
 
 export default function Countries() {
-
+  
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,9 @@ export default function Countries() {
   const [sort, setSort] = useState<"az" | "za">('az');
   const [view, setView] = useState<"list" | "map">("list");
   const [activeCode, setActiveCode] = useState<string | null>(null);
-
+  const [filter, setFilter] = useState<"all" | "visited" | "wishlist" | "none">('all');
+  const { stamps } = useStamps();
+  
   useEffect(() => {
     let oldRequest = false;
 
@@ -50,7 +53,21 @@ export default function Countries() {
     return () => {oldRequest = true;}
   }, [searchInput])
 
-  const sortedCountries = [...countries].sort((a, b) => {
+  const filteredCountries = countries.filter((c) => {
+    const countryStatus = stamps[c.code];
+    switch (filter){
+      case "all":
+        return true;
+      case "visited":
+        return countryStatus === "visited";
+      case "wishlist":
+        return countryStatus === "wishlist";
+      case "none":
+        return countryStatus === undefined;
+    }
+  })
+
+  const sortedCountries = [...filteredCountries].sort((a, b) => {
     if (sort === 'az') {
       return a.name.localeCompare(b.name);
     } 
@@ -58,6 +75,7 @@ export default function Countries() {
   });
 
   const activeCountry  = countries.find((c) => c.code === activeCode);
+
 
   return (
     <>
@@ -76,7 +94,7 @@ export default function Countries() {
         <button className={view === 'map' ? 'sel' : ''}  aria-pressed={view === 'map'} onClick={() => setView('map')}>Map</button>
       </div>
 
-      <select className="pick" aria-label="Filter">
+      <select value={filter} className="pick" aria-label="Filter" onChange={(e) => setFilter(e.target.value as "all" | "visited" | "wishlist" | "none")}>
         <option value="all">Filter: All</option>
         <option value="visited">Filter: Visited</option>
         <option value="wishlist">Filter: Wishlist</option>
@@ -90,12 +108,12 @@ export default function Countries() {
       </div>
 
       {loading ? <p>Loading...</p> : error ? <p>{error}</p> :
-        view === 'list' ? 
+        view === 'list' ? (sortedCountries.length === 0 ? <p>No countries match</p> :
         <div className="tks" style={{ marginTop: 16 }}>
           {sortedCountries.map((c) => (
             <TicketCard key={c.id} country={c} />
           ))}
-        </div> :
+        </div>) :
         <div className="mapw">
           <WorldMap activeCode={activeCode} onSelect={setActiveCode} />
           <aside className="box side">
