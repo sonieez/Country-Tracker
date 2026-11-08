@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import checkAuth from './src/middleware/auth.js';
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 const prisma = new PrismaClient();
 
