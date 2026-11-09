@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="StampZ logo">
+  <title>StampZ</title>
+  <g transform="rotate(0 256 256)" fill="#E8467C" stroke="none">
+    <circle cx="256" cy="256" r="236" fill="none" stroke="#E8467C" stroke-width="24"/>
+    <circle cx="256" cy="256" r="204" fill="none" stroke="#E8467C" stroke-width="7"/>
+    <path transform="translate(119.71 336.36) scale(0.21720 -0.21720)" d="M277 -19C453 -19 555 68 555 198C555 307 503 366 352 432L302 454C229 486 187 525 187 596C187 675 249 719 338 719C368 719 391 715 415 704L458 547H511L518 703C466 739 400 759 322 759C171 759 63 686 63 555C63 441 131 375 260 318L306 298C396 259 426 223 426 154C426 70 366 22 264 22C221 22 189 27 154 42L111 205H58L52 41C108 4 195 -19 277 -19Z"/><path transform="translate(251.55 336.36) scale(0.21720 -0.21720)" d="M26 0H592L596 213H547L497 37H180L586 698V741H50L41 533H97L139 703H433L26 43Z"/>
+  </g>
+</svg>

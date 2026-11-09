@@ -22,7 +22,13 @@ export default function Layout() {
     <div className="wrap">
       <nav className="box">
         <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
-          <span className="ring"></span>StampZ
+          <img
+            src={dark ? '/stampz-logo-artistic-dark.svg' : '/stampz-logo-artistic.svg'}
+            alt=""
+            width={40}
+            height={40}
+          />
+          StampZ
         </Link>
         <NavLink to="/countries" className={({ isActive }) => (isActive ? 'on' : '')}>
           Countries
@@ -66,7 +72,18 @@ export default function Layout() {
 
       <footer className="box">
         <span>Every trip is a stamp · StampZ · 2026</span>
-        <a href="#">About · Contact</a>
+        <span>
+          <Link to="/about">About</Link>
+          {' · '}
+          <a
+            href="https://instagram.com/stampz_app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contact
+          </a>
+          <a href="mailto:sonie.zeynalova@gmail.com"></a>
+        </span>
       </footer>
       
       <SignInModal
