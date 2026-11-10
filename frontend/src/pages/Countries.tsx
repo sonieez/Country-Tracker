@@ -117,7 +117,7 @@ export default function Countries() {
         <div className="mapw">
           <WorldMap activeCode={activeCode} onSelect={setActiveCode} />
           <aside className="box side">
-            {activeCountry ? <TicketCard country={activeCountry} /> : <small>Hover a country to preview it.</small>}
+            {activeCountry ? <TicketCard country={activeCountry} /> : <small>Select a country to preview it.</small>}
           </aside>
         </div>
       }

@@ -40,7 +40,7 @@ export default function WorldMap({ activeCode, onSelect }: Props) {
                     key={geo.rsmKey} 
                     geography={geo} 
                     className={code === activeCode ? "land act" : "land"}
-                    onMouseEnter={() => onSelect(code)}
+                    // onMouseEnter={() => onSelect(code)}
                     onClick={() => onSelect(code)}
                   />
                 )
