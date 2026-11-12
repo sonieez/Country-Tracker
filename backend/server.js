@@ -116,9 +116,19 @@ app.put('/countries/:code/stamp', checkAuth, async(req, res, next) =>{
 app.put('/countries/:code/review', checkAuth, async(req, res, next) => {
   try{
     const rating = req.body.rating;
-    const text = req.body.text;
-    const code = req.params.code;
+    if (!(Number.isInteger(rating) && (1 <= rating && rating <= 5))) {
+      res.status(400).json({ message: "Invalid rating"});
+      return;
+    }
     
+    const rawText = req.body.text;
+    const text = rawText.trim();
+    if (!(typeof text === 'string' && text.length <= 1000)) {
+      res.status(400).json({message: "Invalid Review"});
+      return;
+    }
+
+    const code = req.params.code;
     const country = await prisma.country.findUnique({where: {code}});
     if (!country) {
       res.status(404).json({ message: "Not found" });
