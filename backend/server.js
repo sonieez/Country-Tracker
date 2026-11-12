@@ -113,6 +113,32 @@ app.put('/countries/:code/stamp', checkAuth, async(req, res, next) =>{
   }
 })
 
+app.put('/countries/:code/review', checkAuth, async(req, res, next) => {
+  try{
+    const rating = req.body.rating;
+    const text = req.body.text;
+    const code = req.params.code;
+    
+    const country = await prisma.country.findUnique({where: {code}});
+    if (!country) {
+      res.status(404).json({ message: "Not found" });
+      return;
+    }
+    const countryId = country.id;
+    const userId = req.user.id;
+
+    const review = await prisma.reviews.upsert({
+      where: {userId_countryId: {userId, countryId}},
+      create: {userId, countryId, rating, text}, 
+      update: {rating, text}
+    });
+
+    res.json(review)
+  } catch (error) {
+    next(error)
+  }
+})
+
 app.get('/me', checkAuth, async (req, res, next) => {
   try{
     const user = await prisma.user.upsert({
@@ -154,6 +180,7 @@ app.get('/me/stamps', checkAuth, async (req,res,next) => {
     next(error);
   }
 })
+
 
 
 app.use((err, req, res, next) => {
