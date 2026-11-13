@@ -149,6 +149,34 @@ app.put('/countries/:code/review', checkAuth, async(req, res, next) => {
   }
 })
 
+app.delete('/countries/:code/review', checkAuth, async (req, res, next) => {
+  try {
+    const code = req.params.code;
+    const country = await prisma.country.findUnique({ where: { code } });
+    if (!country) {
+      res.status(404).json({ message: "Not found" });
+      return;
+    }
+    const countryId = country.id;
+    const userId = req.user.id;
+
+    const result = await prisma.reviews.deleteMany({
+      where: { userId, countryId },
+    });
+    if (result.count === 0) {
+      res.status(404).json({ message: "Review not found" });
+      return;
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.get('/countries/:code/reviews', checkAuth, async (req, res, next) => {
+  
+})
+
 app.get('/me', checkAuth, async (req, res, next) => {
   try{
     const user = await prisma.user.upsert({
