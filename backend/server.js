@@ -35,7 +35,26 @@ app.get('/countries', async (req, res, next) => {
         }
       },
     });
-    res.json(countries);
+
+    const stats = await prisma.reviews.groupBy({
+      by: ['countryId'],
+      _avg: { rating: true },
+      _count: true,
+    });
+    const statsByCountry = {};
+    for (const s of stats) {
+      statsByCountry[s.countryId]= s;
+    }
+    const countriesWithStats = countries.map((c) => {
+      const s = statsByCountry[c.id];
+      return {
+        ...c,
+        average: s?._avg.rating ?? null,
+        count: s?._count ?? 0,
+      };
+    });
+
+    res.json(countriesWithStats);
 
   } catch(error) {
     next(error);
