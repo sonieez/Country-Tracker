@@ -122,9 +122,13 @@ app.put('/countries/:code/review', checkAuth, async(req, res, next) => {
     }
     
     const rawText = req.body.text;
+    if (typeof rawText !== 'string') {
+      res.status(400).json({ message: "Invalid Review" });
+      return;
+    }
     const text = rawText.trim();
-    if (!(typeof text === 'string' && text.length <= 1000)) {
-      res.status(400).json({message: "Invalid Review"});
+    if (text.length > 1000) {
+      res.status(400).json({ message: "Invalid Review" });
       return;
     }
 
@@ -173,8 +177,28 @@ app.delete('/countries/:code/review', checkAuth, async (req, res, next) => {
   }
 })
 
-app.get('/countries/:code/reviews', checkAuth, async (req, res, next) => {
-  
+app.get('/countries/:code/reviews', async (req, res, next) => {
+  try{
+    const code = req.params.code;
+    const country = await prisma.country.findUnique({where: {code}});
+    if (!country) {
+      res.status(404).json({message: "Not found"})
+      return;
+    }
+    const countryId = country.id;
+    const reviews = await prisma.reviews.findMany({
+      where: {countryId}, 
+      include: {user: {select: {displayName: true, profilePicture: true}}},
+      orderBy: { createdAt: 'desc' },
+    });
+    const count = reviews.length;
+    const sum = reviews.reduce((sum, r) => sum + r.rating, 0);
+    const average = count === 0 ? null : sum/count;
+    
+    res.json({reviews, average, count });
+  } catch (error) {
+    next(error);
+  }
 })
 
 app.get('/me', checkAuth, async (req, res, next) => {
