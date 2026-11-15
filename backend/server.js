@@ -74,7 +74,23 @@ app.get('/countries/:code', async (req, res, next) => {
       }
     });
 
-    country ? res.json(country) : res.status(404).json({message: 'Not found'})
+    if (!country) {
+      res.status(404).json({message: "Not found"});
+      return;
+    }
+
+    const stats = await prisma.reviews.aggregate({
+      where: { countryId: country.id },
+      _avg: { rating: true },
+      _count: true,
+    });
+    const countryWithStats = {
+      ...country,
+      average: stats._avg.rating ?? null,
+      count: stats._count,
+    }
+
+    res.json(countryWithStats);
 
   } catch (error) {
     next(error);
