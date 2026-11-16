@@ -2,7 +2,15 @@ import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
 import StampButton from '../components/StampButton'
-import type { Country } from '../types'
+
+export type Country = {
+  id: number
+  name: string
+  code: string
+  flag: string
+  average: number | null
+  count: number
+}
 
 export default function CountryPage() {
   const [country, setCountry] = useState<Country | null>(null);
