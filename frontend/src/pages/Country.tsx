@@ -2,13 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
 import StampButton from '../components/StampButton'
-
-type Country = {
-  id: number
-  name: string
-  code: string
-  flag: string
-}
+import type { Country } from '../types'
 
 export default function CountryPage() {
   const [country, setCountry] = useState<Country | null>(null);
@@ -58,7 +52,9 @@ export default function CountryPage() {
             <span className="tg">COUNTRY PASS</span>
             <span className="cd">{country.code}</span>
             <h1>{country.name}</h1>
-            <span className="rate">– / 5</span>
+            <span className="rate">
+              {country.average === null ? "No reviews yet" : country.average.toFixed(1) + " / 5"}
+            </span>
           </div>
           <div className="stub">
             <StampButton code={country.code} name={country.name} />

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import StampButton from "./StampButton";
-
-type Country = { id: number; name: string; code: string; flag: string };
+import type { Country } from '../types';
 
 export default function TicketCard({ country }: { country: Country }) {
   return (
@@ -13,7 +12,9 @@ export default function TicketCard({ country }: { country: Country }) {
         <span className="tg">COUNTRY PASS</span>
         <span className="cd">{country.code}</span>
         <Link className="nm" to={`/countries/${country.code}`}>{country.name}</Link>
-        <span className="rate">– / 5</span>
+        <span className="rate">
+          {country.average === null ? "No reviews yet" : country.average.toFixed(1) + " / 5"}
+        </span>
       </div>
       <div className="stub">
         <StampButton code={country.code} name={country.name} />
