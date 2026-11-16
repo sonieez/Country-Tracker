@@ -3,13 +3,7 @@ import { api } from "../lib/api";
 import TicketCard from "../components/TicketCard";
 import WorldMap from "../components/WorldMap";
 import { useStamps } from "../context/StampsContext";
-
-type Country = {
-  id: number
-  name: string
-  code: string
-  flag: string
-}
+import type { Country } from "../types";
 
 export default function Countries() {
   

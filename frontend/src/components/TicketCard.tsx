@@ -1,14 +1,7 @@
 import { Link } from "react-router-dom";
 import StampButton from "./StampButton";
+import type { Country } from '../types'
 
-export type Country = {
-  id: number
-  name: string
-  code: string
-  flag: string
-  average: number | null
-  count: number
-}
 
 export default function TicketCard({ country }: { country: Country }) {
   return (
