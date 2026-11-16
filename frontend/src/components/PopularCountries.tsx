@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import TicketCard from "./TicketCard";
+import type { Country } from '../types'
 
-type Country = {
-  id: number
-  name: string
-  code: string
-  flag: string
-}
 
 export function PopularCountries() {
   const [countries, setCountries] = useState<Country[]>([]);
