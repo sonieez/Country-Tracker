@@ -183,10 +183,13 @@
   button.sm{padding:5px 12px;font-size:12px}
   button.fill.on,button.sm.on{background:var(--stamp);border-color:var(--stamp);color:#fff}
   :root[data-theme="dark"] button.sm.on{color:#1E1530}
-  .dots{display:flex;gap:8px;align-items:center}
-  .dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--stamp);background:transparent;padding:0}
-  .dot.on{background:var(--stamp)}
-  .dots.s .dot{width:14px;height:14px;pointer-events:none}
+    .dots{display:flex;gap:8px;align-items:center}
+  .dot{width:26px;height:26px;border-radius:50%;border:2px dashed var(--muted);background:transparent;padding:0;position:relative;opacity:.8}
+  .dot.on{border:2.5px solid var(--stamp);opacity:1}
+  .dot.on::after{content:"";position:absolute;inset:3px;border:1.5px solid var(--stamp);border-radius:50%}
+  .dots:not(.s) .dot:hover{transform:scale(1.12)}
+  .dots.s .dot{width:16px;height:16px;pointer-events:none}
+  .dots.s .dot.on::after{inset:2px}
   textarea{width:100%;min-height:76px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:14px Roboto;padding:10px;resize:vertical}
   .rv{padding:18px;margin-bottom:12px}
   .rv .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
