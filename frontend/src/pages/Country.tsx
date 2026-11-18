@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
 import StampButton from '../components/StampButton'
 import type { Country } from '../types'
+import Reviews from '../components/Reviews'
 
 export default function CountryPage() {
   const [country, setCountry] = useState<Country | null>(null);
@@ -66,6 +67,8 @@ export default function CountryPage() {
           <div><span>Visited by</span><b>–</b></div>
           <div><span>Want to go</span><b>–</b></div>
         </section>
+
+        <Reviews code={country.code} />
       </div>
   )
 }
