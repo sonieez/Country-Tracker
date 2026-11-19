@@ -42,6 +42,8 @@ export default function Reviews({ code }: { code: string }) {
       return;
     }
     setSubmitting(true);
+    setSubmitError(null);
+
     try{
       await api(`/countries/${code}/review`, {
         method: "PUT",
@@ -55,12 +57,27 @@ export default function Reviews({ code }: { code: string }) {
       } else {
         setSubmitError("Something went wrong");
       }    
-      } finally {
+    } finally {
       setSubmitting(false);
-      setSubmitError(null);
     }
   }
 
+  async function handleDelete() {
+    setSubmitting(true);
+    setSubmitError(null);
+    try{
+      await api(`/countries/${code}/review`, { method:  "DELETE"})
+      setReloadKey((k) => k + 1);
+    } catch (err) {
+      if (err instanceof Error) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError("Something went wrong");
+      } 
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   useEffect(() => {
     let oldRequest = false;
@@ -112,6 +129,7 @@ export default function Reviews({ code }: { code: string }) {
           <button className="fill" onClick={handleSubmit} disabled={submitting || rating === 0}>
             {myReview ? "Update" : "Post"}
           </button>
+          {myReview && <button onClick={handleDelete} disabled={submitting}>Delete</button>}
         </div>
         {submitError && <p>{submitError}</p>}
       </section>
