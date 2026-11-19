@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 import RatingDots from "./RatingDots";
 
 type Review = {
@@ -20,6 +21,45 @@ export default function Reviews({ code }: { code: string }) {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [rating, setRating] = useState<number>(0);
+  const [text, setText] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const { user, openSignIn } = useAuth();
+
+  const myReview = data?.reviews.find((r) => r.userId === user?.id)
+
+  useEffect(() => {
+    setRating(myReview?.rating ?? 0);
+    setText(myReview?.text ?? "");
+  }, [myReview]);
+
+  async function handleSubmit() {
+    if (!user) {
+      openSignIn();
+      return;
+    }
+    setSubmitting(true);
+    try{
+      await api(`/countries/${code}/review`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, text }),
+      });
+      setReloadKey((k) => k + 1);
+    } catch (err) {
+      if (err instanceof Error) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError("Something went wrong");
+      }    
+      } finally {
+      setSubmitting(false);
+      setSubmitError(null);
+    }
+  }
 
 
   useEffect(() => {
@@ -51,11 +91,30 @@ export default function Reviews({ code }: { code: string }) {
     }
     getReview();
     return () => {oldRequest = true;}
-  }, [code]);
+  }, [code, reloadKey]);
 
   return(
     <div>
       <div className="hd"><h2>Reviews · {data?.count ?? 0}</h2></div>
+      <section className="box rv">
+        <div className="row" style={{ justifyContent: "flex-start", gap: 14 }}>
+          <b>Your rating:</b>
+          <RatingDots value={rating} onChange={setRating} />
+        </div>
+        <b>Your review:</b>
+        <div style={{ display: "flex", gap: 12, marginTop: 8, alignItems: "flex-end" }}>
+          <textarea
+            placeholder="What was it like?"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={1000}
+          />
+          <button className="fill" onClick={handleSubmit} disabled={submitting || rating === 0}>
+            {myReview ? "Update" : "Post"}
+          </button>
+        </div>
+        {submitError && <p>{submitError}</p>}
+      </section>
       {loading ? <p>Loading...</p>
         : error ? <p>{error}</p>
         : !data || data.reviews.length === 0 ? <p>No reviews yet. Be the first!</p>
