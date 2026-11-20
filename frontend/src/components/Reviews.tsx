@@ -17,7 +17,7 @@ type ReviewsData = {
   count: number;
 };
 
-export default function Reviews({ code }: { code: string }) {
+export default function Reviews({ code, onReviewsChanged }: { code: string; onReviewsChanged?: () => void }) {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +51,7 @@ export default function Reviews({ code }: { code: string }) {
         body: JSON.stringify({ rating, text }),
       });
       setReloadKey((k) => k + 1);
+      onReviewsChanged?.();
     } catch (err) {
       if (err instanceof Error) {
         setSubmitError(err.message);
@@ -68,6 +69,7 @@ export default function Reviews({ code }: { code: string }) {
     try{
       await api(`/countries/${code}/review`, { method:  "DELETE"})
       setReloadKey((k) => k + 1);
+      onReviewsChanged?.();
     } catch (err) {
       if (err instanceof Error) {
         setSubmitError(err.message);

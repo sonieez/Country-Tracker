@@ -9,6 +9,7 @@ export default function CountryPage() {
   const [country, setCountry] = useState<Country | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [ reloadkey, setReloadKey ] = useState(0);
   const { code } = useParams()
 
   useEffect(() => {
@@ -40,35 +41,40 @@ export default function CountryPage() {
     }
     getCountry();
     return () => {oldRequest = true;}
-  }, [code])
+  }, [code, reloadkey])
 
   return (
-    loading ? <p>Loading...</p> : error ? <p>{error}</p> : !country ? "Country not found" : 
-      <div className="ch">
-        <section className="tk big">
-          <div className="fb">
-            <img src={country.flag} alt={`Flag of ${country.name}`} />
-          </div>
-          <div className="mid">
-            <span className="tg">COUNTRY PASS</span>
-            <span className="cd">{country.code}</span>
-            <h1>{country.name}</h1>
-            <span className="rate">
-              {country.average === null ? "No reviews yet" : country.average.toFixed(1) + " / 5"}
-            </span>
-          </div>
-          <div className="stub">
-            <StampButton code={country.code} name={country.name} />
-          </div>
-        </section>
+    loading && !country ? <p>Loading...</p> : error ? <p>{error}</p> : !country ? "Country not found" : (
+      <>
+        <div className="ch">
+          <section className="tk big">
+            <div className="fb">
+              <img src={country.flag} alt={`Flag of ${country.name}`} />
+            </div>
+            <div className="mid">
+              <span className="tg">COUNTRY PASS</span>
+              <span className="cd">{country.code}</span>
+              <h1>{country.name}</h1>
+              <span className="rate">
+                {country.average === null ? "No reviews yet" : country.average.toFixed(1) + " / 5"}
+              </span>
+            </div>
+            <div className="stub">
+              <StampButton code={country.code} name={country.name} />
+            </div>
+          </section>
 
-        <section className="box stats">
-          <div><span>Rating</span><b className="r">– / 5</b></div>
-          <div><span>Visited by</span><b>–</b></div>
-          <div><span>Want to go</span><b>–</b></div>
-        </section>
+          <section className="box stats">
+            <div><span>Rating</span><b className="r">
+              {country.average === null ? "No reviews yet" : country.average.toFixed(1) + " / 5"}  
+            </b></div>
+            <div><span>Visited by</span><b>–</b></div>
+            <div><span>Want to go</span><b>–</b></div>
+          </section>
 
-        <Reviews code={country.code} />
-      </div>
+        </div>
+        <Reviews code={country.code} onReviewsChanged={() => setReloadKey((k) => k + 1)} />
+      </>
+    )
   )
 }
