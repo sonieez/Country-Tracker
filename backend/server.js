@@ -278,7 +278,33 @@ app.get('/me/stamps', checkAuth, async (req,res,next) => {
   }
 })
 
+app.get('/me/profile', checkAuth, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const [user, visitedRows, wishlistRows, reviews] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, displayName: true, username: true, profilePicture: true},
+      }),
+      prisma.visited.findMany({ where: { userId }, include: { country: true }}),
+      prisma.wishlist.findMany({ where: { userId }, include: { country: true }}),
+      prisma.reviews.findMany({
+        where: { userId },
+        include: { country: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
 
+    res.json({
+      user, 
+      visited: visitedRows.map((v) => v.country),
+      wishlist: wishlistRows.map((w) => w.country),
+      reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+})
 
 app.use((err, req, res, next) => {
   console.error(err);
