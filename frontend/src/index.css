@@ -200,6 +200,24 @@
   .ban small{letter-spacing:.2em;font-size:11px;opacity:.8}
   .ban .sp{min-width:10px}
   .ban button{color:var(--hero-ink);border-color:var(--hero-ink)}
+  .pz{margin-top:16px;border:10px solid var(--btn);border-radius:20px;background:var(--bg);box-shadow:0 8px 0 color-mix(in srgb,var(--btn) 35%,transparent);overflow:hidden}
+  .pz .pg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}
+  .pz .lp{padding:24px;border-right:1.5px dashed var(--muted)}
+  .pz .rp{padding:24px;min-width:0}
+  .pz .top{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.18em;color:var(--muted);margin-bottom:16px}
+  .pz .top i{width:16px;height:16px;border:2px solid var(--stamp);border-radius:50%}
+  .pz .who{display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px}
+  .pz .photo{width:112px;height:140px;border:1.5px solid var(--line);border-radius:6px;background:var(--soft);display:grid;place-items:center;font:700 44px 'Noto Serif',serif;color:var(--head);overflow:hidden}
+  .pz .photo img{width:100%;height:100%;object-fit:cover}
+  .pz .fld span{display:block;font-size:9px;letter-spacing:.16em;color:var(--muted)}
+  .pz .fld b{display:block;font:500 15px 'Noto Serif',serif;color:var(--head);margin-bottom:8px;overflow-wrap:anywhere}
+  .pz .nums{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px}
+  .pz .nums b{display:block;font:700 22px 'Noto Serif',serif;color:var(--head)}
+  .pz .nums span{font-size:9px;letter-spacing:.12em;color:var(--muted)}
+  .pz .tabs{margin-top:0}
+  .pz .hd{margin:16px 0 0}
+  .pz .mrz2{background:var(--soft);padding:12px 24px;font:500 12px/1.6 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--muted);overflow:hidden;white-space:nowrap}
+  @media(max-width:720px){.pz .pg{grid-template-columns:1fr}.pz .lp{border-right:0;border-bottom:1.5px dashed var(--muted)}}
   .kp{display:flex;gap:36px;padding:18px 24px;margin-top:16px;flex-wrap:wrap}
   .kp b{display:block;font:700 26px 'Noto Serif',serif;color:var(--head)}
   .kp span{font-size:11px;color:var(--muted);letter-spacing:.08em}
