@@ -48,16 +48,20 @@ export default function Layout() {
             user ? 
               <>
                 {user.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt={user.displayName ?? user.email}
-                    referrerPolicy="no-referrer"
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
+                  <Link to="/profile">
+                    <img
+                      src={user.profilePicture}
+                      alt={user.displayName ?? user.email}
+                      referrerPolicy="no-referrer"
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  </Link>
                 ) : (
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-stamp font-bold">
-                    {(user.displayName ?? user.email)[0].toUpperCase()}
-                  </span>
+                  <Link to="/">
+                    <span className="grid h-10 w-10 place-items-center rounded-full bg-stamp font-bold">
+                      {(user.displayName ?? user.email)[0].toUpperCase()}
+                    </span>
+                  </Link>
                 )}
                 <button onClick={signOut} className="fill">Sign Out</button>
               </> : 
@@ -82,7 +86,8 @@ export default function Layout() {
           >
             Contact
           </a>
-          <a href="mailto:sonie.zeynalova@gmail.com"></a>
+          {' · '}
+          <a href="mailto:sonie.zeynalova@gmail.com">Email</a>
         </span>
       </footer>
       
