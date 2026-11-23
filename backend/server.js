@@ -306,10 +306,61 @@ app.get('/me/profile', checkAuth, async (req, res, next) => {
   }
 })
 
+app.get('/me/lists', checkAuth, async (req, res, next) => {
+  try{
+    const [id, name, countries] = await prisma.lists.findMany({
+      where: { userId },
+      include: { listItem: {country : true} }
+    })
+
+    res.json({
+      id,
+      name,
+      countries: countries.map((c) => c.country),
+    })
+
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.post('/lists', checkAuth, async (req, res, next) => {
+  try{
+
+  } catch(error) {
+    next(error);
+  }
+})
+
+app.delete('/lists/:id', checkAuth, async (req, res, next) => {
+  try{
+
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.put('/lists/:id/countries/:code', checkAuth, async (req, res, next) => {
+  try{
+
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.delete('/lists/:id/countries/:code', async (req, res, next) => {
+  try{
+
+  } catch (error) {
+    next(error)
+  }
+})
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({message: 'Problem within the server'})
 })
+
 
 app.listen(PORT, () => {
   console.log(`Server is running`)
