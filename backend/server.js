@@ -308,16 +308,20 @@ app.get('/me/profile', checkAuth, async (req, res, next) => {
 
 app.get('/me/lists', checkAuth, async (req, res, next) => {
   try{
-    const [id, name, countries] = await prisma.lists.findMany({
+    const userId = req.user.id;
+    const lists = await prisma.lists.findMany({
       where: { userId },
-      include: { listItem: {country : true} }
+      include: { listItem: {include: {country : true}} },
+      orderBy: { id: 'desc' },
     })
 
-    res.json({
-      id,
-      name,
-      countries: countries.map((c) => c.country),
-    })
+    res.json(
+      lists.map((list) => ({
+        id: list.id,
+        name: list.name,
+        countries: list.map((c) => c.country),
+      })),
+    )
 
   } catch (error) {
     next(error);
@@ -348,7 +352,7 @@ app.put('/lists/:id/countries/:code', checkAuth, async (req, res, next) => {
   }
 })
 
-app.delete('/lists/:id/countries/:code', async (req, res, next) => {
+app.delete('/lists/:id/countries/:code', checkAuth, async (req, res, next) => {
   try{
 
   } catch (error) {
