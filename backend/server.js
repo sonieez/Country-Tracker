@@ -319,7 +319,7 @@ app.get('/me/lists', checkAuth, async (req, res, next) => {
       lists.map((list) => ({
         id: list.id,
         name: list.name,
-        countries: list.map((c) => c.country),
+        countries: list.listItem.map((c) => c.country),
       })),
     )
 
@@ -329,34 +329,127 @@ app.get('/me/lists', checkAuth, async (req, res, next) => {
 })
 
 app.post('/lists', checkAuth, async (req, res, next) => {
-  try{
+  try {
+    const rawName = req.body.name;
+    if (typeof rawName !== 'string') {
+      res.status(400).json({ message: "Invalid name" });
+      return;
+    }
+    const name = rawName.trim();
+    if (name.length < 1 || name.length > 50) {
+      res.status(400).json({ message: "Invalid name" });
+      return;
+    }
 
-  } catch(error) {
+    const list = await prisma.lists.create({
+      data: { userId: req.user.id, name },
+    });
+
+    res.status(201).json({ id: list.id, name: list.name, countries: [] });
+  } catch (error) {
     next(error);
   }
 })
 
 app.delete('/lists/:id', checkAuth, async (req, res, next) => {
-  try{
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      res.status(400).json({ message: "Invalid id" });
+      return;
+    }
+    const userId = req.user.id;
 
+    const list = await prisma.lists.findFirst({ where: { id, userId } });
+    if (!list) {
+      res.status(404).json({ message: "Not found" });
+      return;
+    }
+
+    await prisma.$transaction([
+      prisma.listItem.deleteMany({ where: { listId: id } }),
+      prisma.lists.delete({ where: { id } }),
+    ]);
+
+    res.json({ ok: true });
   } catch (error) {
     next(error);
   }
 })
 
 app.put('/lists/:id/countries/:code', checkAuth, async (req, res, next) => {
-  try{
+  try {
+    const id = Number(req.params.id);
+    const code = req.params.code;
+    if (!Number.isInteger(id)) {
+      res.status(400).json({ message: "Invalid id" });
+      return;
+    }
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      res.status(400).json({ message: "Invalid code" });
+      return;
+    }
+    const userId = req.user.id;
 
+    const list = await prisma.lists.findFirst({ where: { id, userId } });
+    if (!list) {
+      res.status(404).json({ message: "List not found" });
+      return;
+    }
+    const country = await prisma.country.findUnique({
+      where: { code: code.toUpperCase() },
+    });
+    if (!country) {
+      res.status(404).json({ message: "Country not found" });
+      return;
+    }
+
+    await prisma.listItem.upsert({
+      where: { listId_countryId: { listId: id, countryId: country.id } },
+      create: { listId: id, countryId: country.id },
+      update: {},
+    });
+
+    res.json({ ok: true });
   } catch (error) {
     next(error);
   }
 })
 
 app.delete('/lists/:id/countries/:code', checkAuth, async (req, res, next) => {
-  try{
+  try {
+    const id = Number(req.params.id);
+    const code = req.params.code;
+    if (!Number.isInteger(id)) {
+      res.status(400).json({ message: "Invalid id" });
+      return;
+    }
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      res.status(400).json({ message: "Invalid code" });
+      return;
+    }
+    const userId = req.user.id;
 
+    const list = await prisma.lists.findFirst({ where: { id, userId } });
+    if (!list) {
+      res.status(404).json({ message: "List not found" });
+      return;
+    }
+    const country = await prisma.country.findUnique({
+      where: { code: code.toUpperCase() },
+    });
+    if (!country) {
+      res.status(404).json({ message: "Country not found" });
+      return;
+    }
+
+    await prisma.listItem.deleteMany({
+      where: { listId: id, countryId: country.id },
+    });
+
+    res.json({ ok: true });
   } catch (error) {
-    next(error)
+    next(error);
   }
 })
 
