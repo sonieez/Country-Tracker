@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import RatingDots from "../components/RatingDots";
+import ListsTab from "../components/ListsTab";
 
 
 type ProfileReview = {
@@ -110,7 +111,7 @@ export default function Profile() {
 
           <div className="rp">
             <div className="tabs">
-              {["Stamps", "Wishlist", "Reviews"].map((t) => (
+              {["Stamps", "Wishlist", "Lists", "Reviews"].map((t) => (
                 <a key={t} className={t === tab ? "on" : ""} onClick={() => setTab(t)}>{t}</a>
               ))}
             </div>
@@ -141,6 +142,8 @@ export default function Profile() {
                   <div><Link className="stamp add" to="/countries">+</Link>Add a stamp</div>
                 </div>
               </>
+            ) : tab === "Lists" ? (
+              <ListsTab />
             ) : (
               <>
                 <div className="hd"><h2>Your reviews · {data.reviews.length}</h2></div>

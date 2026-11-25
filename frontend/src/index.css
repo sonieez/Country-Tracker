@@ -301,4 +301,37 @@
     .stamp:active{transform:scale(.85) rotate(-8deg)}
   }
 
+  /* Lists tab */
+  .lform{display:flex;gap:10px;margin:14px 0 18px;flex-wrap:wrap}
+  .lform .search{flex:1 1 220px;max-width:none;margin-top:0}
+  .lform button:disabled{opacity:.5;cursor:default}
+  .lerr{color:var(--stamp);margin:0 0 12px}
+  .lc{padding:16px 18px;margin-bottom:14px}
+  .lc .lh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .lc .lh b{font:500 18px 'Noto Serif',serif;color:var(--head);display:block}
+  .lc .lh small{display:block;color:var(--muted);letter-spacing:.1em;font-size:10px}
+  .lchips{display:flex;flex-wrap:wrap;gap:8px}
+  .lchip{display:inline-flex;align-items:center;gap:8px;padding:4px 6px 4px 4px;border:1.5px solid var(--line);border-radius:99px;background:var(--bg);font-size:13px}
+  .lchip img{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid var(--line)}
+  .lchip a{color:var(--text);text-decoration:none}
+  .lchip a:hover{color:var(--stamp)}
+  .lchip button{width:22px;height:22px;padding:0;border:0;border-radius:50%;font-size:15px;line-height:1;color:var(--muted)}
+  .lchip button:hover{background:var(--soft);color:var(--stamp)}
+  .lempty{border:1.5px dashed var(--muted);border-radius:12px;background:var(--soft);padding:14px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* Add to list dropdown */
+  .dd{position:relative;display:inline-block}
+  .ddm{position:absolute;top:calc(100% + 8px);right:0;z-index:30;width:240px;padding:8px;text-align:left}
+  .ddm .ddt{font-size:10px;letter-spacing:.16em;color:var(--muted);padding:6px 10px 4px}
+  .ddm .ddmsg{margin:0;padding:8px 10px;color:var(--muted);font-size:13px}
+  .ddm .ddmsg.err{color:var(--stamp)}
+  .ddi{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:12px;padding:8px 10px;text-align:left;color:var(--text);font-weight:400}
+  .ddi:hover:not(:disabled){background:var(--soft)}
+  .ddi:disabled{opacity:.6;cursor:default}
+  .ddi .ddk{width:22px;height:22px;border-radius:50%;border:2px dashed var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--stamp);flex:none}
+  .ddi.on .ddk{border:2px solid var(--stamp)}
+  .ddi .ddn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ddi small{color:var(--muted)}
+  .ddm .ddf{display:block;margin-top:4px;padding:10px 10px 6px;border-top:1.5px solid var(--soft);font-size:12px;color:var(--head);text-decoration:none}
+  .ddm .ddf:hover{color:var(--stamp)}
 }

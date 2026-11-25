@@ -4,6 +4,8 @@ import { api } from '../lib/api'
 import StampButton from '../components/StampButton'
 import type { Country } from '../types'
 import Reviews from '../components/Reviews'
+import AddToListButton from '../components/AddToListButton'
+
 
 export default function CountryPage() {
   const [country, setCountry] = useState<Country | null>(null);
@@ -61,8 +63,11 @@ export default function CountryPage() {
             </div>
             <div className="stub">
               <StampButton code={country.code} name={country.name} />
+              <AddToListButton code={country.code} />
             </div>
           </section>
+
+          
 
           <section className="box stats">
             <div><span>Rating</span><b className="r">
