@@ -6,6 +6,7 @@ import type { Country } from '../types'
 import Reviews from '../components/Reviews'
 import AddToListButton from '../components/AddToListButton'
 import CountryPeople from '../components/CountryPeople'
+import CountryLocationMap from '../components/CountryLocationMap'
 
 
 export default function CountryPage() {
@@ -79,6 +80,9 @@ export default function CountryPage() {
           </section>
 
         </div>
+
+        <div className="hd"><h2>Where is {country.name}?</h2></div>
+        <CountryLocationMap code={country.code} />
 
         <CountryPeople
           code={country.code}

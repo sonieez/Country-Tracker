@@ -472,4 +472,8 @@
     .pz .lp{padding-bottom:44px}
     .pz .pbody{flex:none;height:380px;padding:14px 16px;border-radius:0}
   }
+
+    /* Country page location map */
+  .locmap svg{max-height:360px}
+  .locmap .land{pointer-events:none}
 }
