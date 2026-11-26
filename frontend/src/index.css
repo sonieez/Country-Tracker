@@ -334,4 +334,10 @@
   .ddi small{color:var(--muted)}
   .ddm .ddf{display:block;margin-top:4px;padding:10px 10px 6px;border-top:1.5px solid var(--soft);font-size:12px;color:var(--head);text-decoration:none}
   .ddm .ddf:hover{color:var(--stamp)}
+
+  /* People / follow */
+  img.av{object-fit:cover}
+  .ppl a.n{color:var(--text);text-decoration:none}
+  .ppl a.n:hover{color:var(--stamp)}
+  .pz .follow{margin-top:16px}
 }

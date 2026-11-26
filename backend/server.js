@@ -79,15 +79,21 @@ app.get('/countries/:code', async (req, res, next) => {
       return;
     }
 
-    const stats = await prisma.reviews.aggregate({
-      where: { countryId: country.id },
-      _avg: { rating: true },
-      _count: true,
-    });
+      const [stats, visitedCount, wishlistCount] = await Promise.all([
+      prisma.reviews.aggregate({
+        where: { countryId: country.id },
+        _avg: { rating: true },
+        _count: true,
+      }),
+      prisma.visited.count({ where: { countryId: country.id } }),
+      prisma.wishlist.count({ where: { countryId: country.id } }),
+    ]);
     const countryWithStats = {
       ...country,
       average: stats._avg.rating ?? null,
       count: stats._count,
+      visitedCount,
+      wishlistCount,
     }
 
     res.json(countryWithStats);
@@ -281,7 +287,7 @@ app.get('/me/stamps', checkAuth, async (req,res,next) => {
 app.get('/me/profile', checkAuth, async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const [user, visitedRows, wishlistRows, reviews] = await Promise.all([
+    const [user, visitedRows, wishlistRows, reviews, followersCount, followingCount] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
         select: { id: true, displayName: true, username: true, profilePicture: true},
@@ -293,13 +299,17 @@ app.get('/me/profile', checkAuth, async (req, res, next) => {
         include: { country: true },
         orderBy: { createdAt: 'desc' },
       }),
+      prisma.follow.count({ where: { followingId: userId } }),
+      prisma.follow.count({ where: { followerId: userId } }),
     ]);
 
     res.json({
-      user, 
+      user,
       visited: visitedRows.map((v) => v.country),
       wishlist: wishlistRows.map((w) => w.country),
       reviews,
+      followersCount,
+      followingCount,
     });
   } catch (error) {
     next(error);
@@ -448,6 +458,139 @@ app.delete('/lists/:id/countries/:code', checkAuth, async (req, res, next) => {
     });
 
     res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.get('/countries/:code/people', async (req, res, next) => {
+  try {
+    const code = req.params.code;
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      res.status(400).json({ message: "Invalid code" });
+      return;
+    }
+    const country = await prisma.country.findUnique({
+      where: { code: code.toUpperCase() },
+    });
+    if (!country) {
+      res.status(404).json({ message: "Not found" });
+      return;
+    }
+    const countryId = country.id;
+    const userSelect = { id: true, displayName: true, username: true, profilePicture: true };
+
+    const [visitedRows, wishlistRows] = await Promise.all([
+      prisma.visited.findMany({
+        where: { countryId },
+        take: 12,
+        include: { user: { select: userSelect } },
+      }),
+      prisma.wishlist.findMany({
+        where: { countryId },
+        take: 12,
+        include: { user: { select: userSelect } },
+      }),
+    ]);
+
+    res.json({
+      visited: visitedRows.map((v) => v.user),
+      wishlist: wishlistRows.map((w) => w.user),
+    });
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.get('/users/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, displayName: true, username: true, profilePicture: true },
+    });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const [visitedRows, wishlistRows, reviews, followersCount, followingCount] = await Promise.all([
+      prisma.visited.findMany({ where: { userId: id }, include: { country: true } }),
+      prisma.wishlist.findMany({ where: { userId: id }, include: { country: true } }),
+      prisma.reviews.findMany({
+        where: { userId: id },
+        include: { country: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.follow.count({ where: { followingId: id } }),
+      prisma.follow.count({ where: { followerId: id } }),
+    ]);
+
+    res.json({
+      user,
+      visited: visitedRows.map((v) => v.country),
+      wishlist: wishlistRows.map((w) => w.country),
+      reviews,
+      followersCount,
+      followingCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.put('/users/:id/follow', checkAuth, async (req, res, next) => {
+  try {
+    const targetId = req.params.id;
+    const userId = req.user.id;
+    if (targetId === userId) {
+      res.status(400).json({ message: "You cannot follow yourself" });
+      return;
+    }
+    const target = await prisma.user.findUnique({
+      where: { id: targetId },
+      select: { id: true },
+    });
+    if (!target) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    await prisma.follow.upsert({
+      where: { followerId_followingId: { followerId: userId, followingId: targetId } },
+      create: { followerId: userId, followingId: targetId },
+      update: {},
+    });
+
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.delete('/users/:id/follow', checkAuth, async (req, res, next) => {
+  try {
+    await prisma.follow.deleteMany({
+      where: { followerId: req.user.id, followingId: req.params.id },
+    });
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.get('/me/following', checkAuth, async (req, res, next) => {
+  try {
+    const rows = await prisma.follow.findMany({
+      where: { followerId: req.user.id },
+      include: {
+        following: {
+          select: { id: true, displayName: true, username: true, profilePicture: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(rows.map((r) => r.following));
   } catch (error) {
     next(error);
   }

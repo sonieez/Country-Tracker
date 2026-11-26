@@ -5,4 +5,6 @@ export type Country = {
   flag: string
   average: number | null
   count: number
+  visitedCount?: number;
+  wishlistCount?: number;
 }

@@ -5,6 +5,7 @@ import StampButton from '../components/StampButton'
 import type { Country } from '../types'
 import Reviews from '../components/Reviews'
 import AddToListButton from '../components/AddToListButton'
+import CountryPeople from '../components/CountryPeople'
 
 
 export default function CountryPage() {
@@ -73,11 +74,18 @@ export default function CountryPage() {
             <div><span>Rating</span><b className="r">
               {country.average === null ? "No reviews yet" : country.average.toFixed(1) + " / 5"}  
             </b></div>
-            <div><span>Visited by</span><b>–</b></div>
-            <div><span>Want to go</span><b>–</b></div>
+            <div><span>Visited by</span><b>{country.visitedCount ?? "–"}</b></div>
+            <div><span>Want to go</span><b>{country.wishlistCount ?? "–"}</b></div>
           </section>
 
         </div>
+
+        <CountryPeople
+          code={country.code}
+          visitedCount={country.visitedCount ?? 0}
+          wishlistCount={country.wishlistCount ?? 0}
+        />
+
         <Reviews code={country.code} onReviewsChanged={() => setReloadKey((k) => k + 1)} />
       </>
     )

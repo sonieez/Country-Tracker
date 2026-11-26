@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import RatingDots from "../components/RatingDots";
 import ListsTab from "../components/ListsTab";
+import { useFollow } from "../context/FollowContext";
+import PersonRow from "../components/PersonRow";
 
 
 type ProfileReview = {
@@ -23,7 +25,8 @@ type ProfileData = {
   };
   visited: Country[];
   wishlist: Country[];
-  reviews: ProfileReview[]
+  reviews: ProfileReview[];
+  followersCount: number;
 }
 
 export default function Profile() {
@@ -37,6 +40,8 @@ export default function Profile() {
   const passportNo = "SZ" + (data?.user.id ?? "").replace(/[^0-9a-z]/gi, "").slice(0, 8).toUpperCase();
   const mrz1 = ("P<STZ<<" + nameLine).padEnd(44, "<").slice(0, 44);
   const mrz2 = (passportNo + "<STZ<" + (data?.visited.length ?? 0) + "<250").padEnd(44, "<").slice(0, 44);
+
+  const { following } = useFollow();
 
   useEffect(() => {
     let oldRequest = false;
@@ -106,12 +111,14 @@ export default function Profile() {
               <div><b>{data.visited.length} / 250</b><span>STAMPS</span></div>
               <div><b>{data.wishlist.length}</b><span>WISHLIST</span></div>
               <div><b>{data.reviews.length}</b><span>REVIEWS</span></div>
+              <div><b>{data.followersCount}</b><span>FOLLOWERS</span></div>
+              <div><b>{following.length}</b><span>FOLLOWING</span></div>
             </div>
           </div>
 
           <div className="rp">
             <div className="tabs">
-              {["Stamps", "Wishlist", "Lists", "Reviews"].map((t) => (
+              {["Stamps", "Wishlist", "Lists", "Reviews", "Following"].map((t) => (
                 <a key={t} className={t === tab ? "on" : ""} onClick={() => setTab(t)}>{t}</a>
               ))}
             </div>
@@ -144,6 +151,19 @@ export default function Profile() {
               </>
             ) : tab === "Lists" ? (
               <ListsTab />
+            ) : tab === "Following" ? (
+              <>
+                <div className="hd"><h2>Following · {following.length}</h2></div>
+                {following.length === 0 ? (
+                  <div className="lempty">You don't follow anyone yet.</div>
+                ) : (
+                  <div className="two" style={{ marginTop: 14 }}>
+                    {following.map((p) => (
+                      <PersonRow key={p.id} person={p} />
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <div className="hd"><h2>Your reviews · {data.reviews.length}</h2></div>

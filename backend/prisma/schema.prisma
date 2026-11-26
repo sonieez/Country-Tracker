@@ -26,6 +26,9 @@ model User {
   wishlist        Wishlist[]
   reviews         Reviews[]
   lists           Lists[]
+
+  following       Follow[] @relation("Following")
+  followers       Follow[] @relation("Followers")
 }
 
 model Country {
@@ -92,4 +95,14 @@ model ListItem {
   country   Country   @relation(fields: [countryId], references: [id])
 
   @@id([listId, countryId])
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Following", fields: [followerId], references: [id])
+  following   User     @relation("Followers", fields: [followingId], references: [id])
+
+  @@id([followerId, followingId])
 }

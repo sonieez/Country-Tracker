@@ -6,6 +6,7 @@ import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import Countries from './pages/Countries'
 import About from './pages/About'
+import UserProfile from './pages/UserProfile'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path='/countries' element={<Countries />} />
         <Route path="/countries/:code" element={<CountryPage />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/users/:id" element={<UserProfile />} />
         <Route path='/about' element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Route>
