@@ -123,63 +123,67 @@ export default function Profile() {
               ))}
             </div>
 
-            {tab === "Stamps" ? (
-              <>
-                <div className="hd"><h2>Visited · {data.visited.length}</h2><small>Tap a stamp to open the country</small></div>
-                <div className="sg">
-                  {data.visited.map((c) => (
-                    <div key={c.code}>
-                      <Link className="stamp" to={`/countries/${c.code}`}>{c.code}</Link>
-                      {c.name}
+              <div className="pbody">
+                {tab === "Stamps" ? (
+                  <>
+                    <div className="hd"><h2>Visited · {data.visited.length}</h2><small>Tap a stamp to open the country</small></div>
+                    <div className="sg">
+                      {data.visited.map((c) => (
+                        <div key={c.code}>
+                          <Link className="stamp" to={`/countries/${c.code}`}>{c.code}</Link>
+                          {c.name}
+                        </div>
+                      ))}
+                      <div><Link className="stamp add" to="/countries">+</Link>Add a stamp</div>
                     </div>
-                  ))}
-                  <div><Link className="stamp add" to="/countries">+</Link>Add a stamp</div>
-                </div>
-              </>
-            ) : tab === "Wishlist" ? (
-              <>
-                <div className="hd"><h2>Wishlist · {data.wishlist.length}</h2></div>
-                <div className="sg">
-                  {data.wishlist.map((c) => (
-                    <div key={c.code}>
-                      <Link className="stamp wish" to={`/countries/${c.code}`}>{c.code}</Link>
-                      {c.name}
+                  </>
+                ) : tab === "Wishlist" ? (
+                  <>
+                    <div className="hd"><h2>Wishlist · {data.wishlist.length}</h2></div>
+                    <div className="sg">
+                      {data.wishlist.map((c) => (
+                        <div key={c.code}>
+                          <Link className="stamp wish" to={`/countries/${c.code}`}>{c.code}</Link>
+                          {c.name}
+                        </div>
+                      ))}
+                      <div><Link className="stamp add" to="/countries">+</Link>Add a stamp</div>
                     </div>
-                  ))}
-                  <div><Link className="stamp add" to="/countries">+</Link>Add a stamp</div>
-                </div>
-              </>
-            ) : tab === "Lists" ? (
-              <ListsTab />
-            ) : tab === "Following" ? (
-              <>
-                <div className="hd"><h2>Following · {following.length}</h2></div>
-                {following.length === 0 ? (
-                  <div className="lempty">You don't follow anyone yet.</div>
+                  </>
+                ) : tab === "Lists" ? (
+                  <ListsTab />
+                ) : tab === "Following" ? (
+                  <>
+                    <div className="hd"><h2>Following · {following.length}</h2></div>
+                    {following.length === 0 ? (
+                      <div className="lempty">You don't follow anyone yet.</div>
+                    ) : (
+                      <div className="two" style={{ marginTop: 14 }}>
+                        {following.map((p) => (
+                          <PersonRow key={p.id} person={p} />
+                        ))}
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="two" style={{ marginTop: 14 }}>
-                    {following.map((p) => (
-                      <PersonRow key={p.id} person={p} />
-                    ))}
-                  </div>
+                  <>
+                    <div className="hd"><h2>Your reviews · {data.reviews.length}</h2></div>
+                    {data.reviews.length === 0 ? (
+                      <p>No reviews yet</p>
+                    ) : (
+                      data.reviews.map((r) => (
+                        <div key={r.country.code} style={{ marginTop: 14 }}>
+                          <Link to={`/countries/${r.country.code}`}><b>{r.country.name}</b></Link>
+                          <RatingDots value={r.rating} />
+                          {r.text && <p>{r.text}</p>}
+                        </div>
+                      ))
+                    )}
+                  </>
                 )}
-              </>
-            ) : (
-              <>
-                <div className="hd"><h2>Your reviews · {data.reviews.length}</h2></div>
-                {data.reviews.length === 0 ? (
-                  <p>No reviews yet</p>
-                ) : (
-                  data.reviews.map((r) => (
-                    <div key={r.country.code} style={{ marginTop: 14 }}>
-                      <Link to={`/countries/${r.country.code}`}><b>{r.country.name}</b></Link>
-                      <RatingDots value={r.rating} />
-                      {r.text && <p>{r.text}</p>}
-                    </div>
-                  ))
-                )}
-              </>
-            )}
+
+              </div>
+
           </div>
         </div>
 

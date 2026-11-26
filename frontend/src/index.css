@@ -340,4 +340,67 @@
   .ppl a.n{color:var(--text);text-decoration:none}
   .ppl a.n:hover{color:var(--stamp)}
   .pz .follow{margin-top:16px}
+
+    /* ===== 14.2 Passport: sabit hündürlük ===== */
+  .pz .pg{height:560px;grid-template-rows:minmax(0,1fr)}
+  .pz .lp{overflow-y:auto;min-width:0}
+  .pz .rp{display:flex;flex-direction:column;min-height:0}
+  .pz .pbody{flex:1;min-height:0;overflow-y:auto;padding-right:4px}
+  .pz .tabs a{white-space:nowrap}
+
+  /* ===== 14.3 Responsive ===== */
+  body{overflow-x:hidden}
+  img{max-width:100%}
+
+  /* uzun ölkə adları */
+  .tk .nm{overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ch h1,.tk.big .nm{overflow-wrap:anywhere}
+  .sg div{overflow-wrap:anywhere}
+  .lchip a,.ppl .n{overflow-wrap:anywhere}
+
+  @media(max-width:720px){
+    .wrap{padding:12px}
+    nav{gap:12px;padding:10px 14px}
+    .logo{font-size:18px}
+
+    /* passport: mobildə tək sütun, tab məzmunu sabit hündürlükdə */
+    .pz{border-width:6px;border-radius:16px}
+    .pz .pg{height:auto}
+    .pz .lp,.pz .rp{padding:16px}
+    .pz .who{grid-template-columns:88px minmax(0,1fr);gap:12px}
+    .pz .photo{width:88px;height:110px;font-size:36px}
+    .pz .nums{gap:14px}
+    .pz .nums b{font-size:18px}
+    .pz .tabs{gap:16px;flex-wrap:nowrap;overflow-x:auto}
+    .pz .pbody{flex:none;height:380px}
+    .pz .mrz2{padding:10px 12px;font-size:10px;letter-spacing:.08em}
+
+    /* ticket kartları */
+    .tk .cd{font-size:24px}
+    .tk .mid{padding:10px 12px}
+    .tk.big .cd{font-size:30px}
+    .ch h1{font-size:26px}
+    .flag{width:64px;height:44px}
+    .ch .a>div:first-child{padding:16px;gap:12px}
+
+    .tb .seg2,.tb .pick{flex:1 1 auto}
+    .hero .pass{transform:none}
+  }
+
+  @media(max-width:480px){
+    .tk{grid-template-columns:64px minmax(0,1fr) 92px}
+    .tk .stamp{width:48px;height:48px;font-size:11px}
+    .tk .cap{display:none}
+
+    /* böyük ticket (ölkə səhifəsi) şaquli düzülür */
+    .tk.big{grid-template-columns:1fr;min-height:0}
+    .tk.big .fb{height:120px;border-right:0;border-bottom:1.5px solid var(--line);border-radius:14px 14px 0 0}
+    .tk.big .mid{padding:14px 16px}
+    .tk.big .stub{border-left:0;border-top:2px dashed var(--line);flex-direction:row;padding:12px}
+    .tk.big .stub::before,.tk.big .stub::after{display:none}
+    .tk.big .stamp{width:72px;height:72px;font-size:14px}
+
+    .lform .search{flex:1 1 100%}
+    .ddm{width:min(240px,calc(100vw - 48px))}
+  }
 }
