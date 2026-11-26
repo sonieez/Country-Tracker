@@ -7,6 +7,7 @@ import RatingDots from "../components/RatingDots";
 import ListsTab from "../components/ListsTab";
 import { useFollow } from "../context/FollowContext";
 import PersonRow from "../components/PersonRow";
+import EditProfileModal from "../components/EditProfileModal";
 
 
 type ProfileReview = {
@@ -34,6 +35,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState("Stamps");
+  const [editOpen, setEditOpen] = useState(false);
 
   const { user, openSignIn } = useAuth();
   const nameLine = (data?.user.displayName ?? "TRAVELER").toUpperCase().replace(/[^A-Z]+/g, "<");
@@ -114,6 +116,8 @@ export default function Profile() {
               <div><b>{data.followersCount}</b><span>FOLLOWERS</span></div>
               <div><b>{following.length}</b><span>FOLLOWING</span></div>
             </div>
+
+            <button className="fill sm follow" onClick={() => setEditOpen(true)}>Edit profile</button>
           </div>
 
           <div className="rp">
@@ -188,6 +192,14 @@ export default function Profile() {
         </div>
 
         <div className="mrz2">{mrz1}<br />{mrz2}</div>
+
+        {editOpen && (
+          <EditProfileModal
+            initial={data.user}
+            onClose={() => setEditOpen(false)}
+            onSaved={() => window.location.reload()}
+          />
+        )}
       </section>
     )
   )

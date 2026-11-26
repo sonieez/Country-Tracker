@@ -245,6 +245,73 @@ app.get('/me', checkAuth, async (req, res, next) => {
   }
 })
 
+app.put('/me', checkAuth, async (req, res, next) => {
+  try {
+    const { displayName, username, profilePicture } = req.body;
+    const data = {};
+
+    if (displayName !== undefined) {
+      if (typeof displayName !== 'string') {
+        return res.status(400).json({ message: 'Invalid name' });
+      }
+      const name = displayName.trim();
+      if (name.length < 1 || name.length > 40) {
+        return res.status(400).json({ message: 'Name must be 1-40 characters' });
+      }
+      data.displayName = name;
+    }
+
+    if (username !== undefined) {
+      if (username === null || username === '') {
+        data.username = null;
+      } else {
+        if (typeof username !== 'string') {
+          return res.status(400).json({ message: 'Invalid username' });
+        }
+        const u = username.trim().toLowerCase();
+        if (!/^[a-z0-9_]{3,20}$/.test(u)) {
+          return res.status(400).json({ message: 'Username: 3-20 chars, a-z, 0-9 and _ only' });
+        }
+        data.username = u;
+      }
+    }
+
+    if (profilePicture !== undefined) {
+      if (profilePicture === null) {
+        data.profilePicture = null;
+      } else {
+        let parsed;
+        try {
+          parsed = new URL(profilePicture);
+        } catch {
+          return res.status(400).json({ message: 'Invalid picture URL' });
+        }
+        if (parsed.protocol !== 'https:' || profilePicture.length > 500) {
+          return res.status(400).json({ message: 'Invalid picture URL' });
+        }
+        data.profilePicture = profilePicture;
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: 'Nothing to update' });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data,
+      select: { id: true, displayName: true, username: true, profilePicture: true },
+    });
+
+    res.json(user);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ message: 'This username is already taken' });
+    }
+    next(error);
+  }
+});
+
 app.get('/me/stamps', checkAuth, async (req,res,next) => {
   try{
     const userId = req.user.id;
