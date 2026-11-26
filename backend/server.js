@@ -646,6 +646,23 @@ app.get('/me/following', checkAuth, async (req, res, next) => {
   }
 })
 
+app.get('/me/followers', checkAuth, async (req, res, next) => {
+  try {
+    const rows = await prisma.follow.findMany({
+      where: { followingId: req.user.id },
+      include: {
+        follower: {
+          select: { id: true, displayName: true, username: true, profilePicture: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(rows.map((r) => r.follower));
+  } catch (error) {
+    next(error);
+  }
+})
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({message: 'Problem within the server'})

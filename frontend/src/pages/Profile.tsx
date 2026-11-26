@@ -44,6 +44,16 @@ export default function Profile() {
   const mrz2 = (passportNo + "<STZ<" + (data?.visited.length ?? 0) + "<250").padEnd(44, "<").slice(0, 44);
 
   const { following } = useFollow();
+  const [followers, setFollowers] = useState<typeof following | null>(null);
+
+  useEffect(() => {
+    if (tab !== "Followers" || !user) return;
+    let oldRequest = false;
+    api('/me/followers')
+      .then((res) => { if (!oldRequest) setFollowers(res); })
+      .catch(console.error);
+    return () => { oldRequest = true; };
+  }, [tab, user]);
 
   useEffect(() => {
     let oldRequest = false;
@@ -109,12 +119,31 @@ export default function Profile() {
                 <div className="fld"><span>PASSPORT NO.</span><b>{passportNo}</b></div>
               </div>
             </div>
-            <div className="nums">
-              <div><b>{data.visited.length} / 250</b><span>STAMPS</span></div>
-              <div><b>{data.wishlist.length}</b><span>WISHLIST</span></div>
-              <div><b>{data.reviews.length}</b><span>REVIEWS</span></div>
-              <div><b>{data.followersCount}</b><span>FOLLOWERS</span></div>
-              <div><b>{following.length}</b><span>FOLLOWING</span></div>
+            <div className="pstats">
+              <div className="pbig">
+                <div>
+                  <b>{data.visited.length}</b>
+                  <span>/ 250 STAMPS</span>
+                </div>
+                <div className="pbar">
+                  <i style={{ width: `${(data.visited.length / 250) * 100}%` }} />
+                </div>
+              </div>
+
+              <div className="pmini">
+                <div><b>{data.wishlist.length}</b><span>WISHLIST</span></div>
+                <div><b>{data.reviews.length}</b><span>REVIEWS</span></div>
+              </div>
+
+              <div className="psoc">
+                <button type="button" onClick={() => setTab("Followers")}>
+                  <b>{data.followersCount}</b> followers
+                </button>
+                <span>·</span>
+                <button type="button" onClick={() => setTab("Following")}>
+                  <b>{following.length}</b> following
+                </button>
+              </div>
             </div>
 
             <button className="fill sm follow" onClick={() => setEditOpen(true)}>Edit profile</button>
@@ -122,7 +151,7 @@ export default function Profile() {
 
           <div className="rp">
             <div className="tabs">
-              {["Stamps", "Wishlist", "Lists", "Reviews", "Following"].map((t) => (
+              {["Stamps", "Wishlist", "Lists", "Reviews", "Followers", "Following"].map((t) => (
                 <a key={t} className={t === tab ? "on" : ""} onClick={() => setTab(t)}>{t}</a>
               ))}
             </div>
@@ -156,6 +185,21 @@ export default function Profile() {
                   </>
                 ) : tab === "Lists" ? (
                   <ListsTab />
+                ) : tab === "Followers" ? (
+                  <>
+                    <div className="hd"><h2>Followers · {data.followersCount}</h2></div>
+                    {followers === null ? (
+                      <p>Loading...</p>
+                    ) : followers.length === 0 ? (
+                      <div className="lempty">No followers yet.</div>
+                    ) : (
+                      <div className="two" style={{ marginTop: 14 }}>
+                        {followers.map((p) => (
+                          <PersonRow key={p.id} person={p} />
+                        ))}
+                      </div>
+                    )}
+                  </>
                 ) : tab === "Following" ? (
                   <>
                     <div className="hd"><h2>Following · {following.length}</h2></div>

@@ -353,7 +353,7 @@
   img{max-width:100%}
 
   /* uzun ölkə adları */
-  .tk .nm{overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tk .nm{overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .ch h1,.tk.big .nm{overflow-wrap:anywhere}
   .sg div{overflow-wrap:anywhere}
   .lchip a,.ppl .n{overflow-wrap:anywhere}
@@ -402,5 +402,74 @@
 
     .lform .search{flex:1 1 100%}
     .ddm{width:min(240px,calc(100vw - 48px))}
+  }
+  /* ===== Passport: stats ===== */
+  .pz .pstats{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+  .pz .pbig b{font:700 34px/1 'Noto Serif',serif;color:var(--head)}
+  .pz .pbig span{font-size:11px;letter-spacing:.14em;color:var(--muted);margin-left:6px}
+  .pz .pbar{height:10px;margin-top:8px;border:1.5px solid var(--line);border-radius:99px;overflow:hidden;background:var(--card)}
+  .pz .pbar i{display:block;height:100%;background:var(--stamp);border-radius:99px}
+  .pz .pmini{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pz .pmini div{background:var(--soft);border-radius:12px;padding:10px 12px}
+  .pz .pmini b{display:block;font:700 20px 'Noto Serif',serif;color:var(--head)}
+  .pz .pmini span{font-size:9px;letter-spacing:.14em;color:var(--muted)}
+  .pz .psoc{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+  .pz .psoc button{border:0;border-radius:0;padding:0;font:400 13px Roboto,sans-serif;color:var(--muted)}
+  .pz .psoc button b{color:var(--head);font-weight:700}
+  .pz .psoc button:hover{color:var(--stamp)}
+
+  /* ===== Passport: book index tabs ===== */
+  .pz .rp{padding-top:16px}
+  .pz .tabs{display:flex;align-items:flex-end;gap:4px;margin:0 0 -2px;padding:0 0 2px;border-bottom:0;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;position:relative;z-index:1;scrollbar-width:none}
+  .pz .tabs::-webkit-scrollbar{display:none}
+  .pz .tabs a{padding:7px 12px;margin:0;font-size:13px;white-space:nowrap;background:var(--soft);color:var(--muted);border:1.5px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;opacity:.85}
+  .pz .tabs a:hover{opacity:1;color:var(--head)}
+  .pz .tabs a.on{padding:10px 14px 12px;margin-bottom:-2px;background:var(--bg);color:var(--head);font-weight:700;opacity:1;border-top:3px solid var(--stamp)}
+  .pz .pbody{background:var(--bg);border:1.5px solid var(--line);border-radius:0 12px 12px 12px;padding:14px 16px}
+  .pz .pbody .hd{margin:0 0 6px}
+  .pz .pbody .sg{margin-top:10px}
+
+  @media(max-width:720px){
+    .pz .pbody{flex:none;height:380px}
+    .pz .rp{padding-top:14px}
+    .pz .tabs a{padding:6px 10px;font-size:12px}
+    .pz .tabs a.on{padding:9px 12px 11px}
+  }
+
+  /* ===== Passport: sağ yarı = səhifənin özü ===== */
+  .pz .rp{padding:16px 0 0}
+  .pz .tabs{padding:0 16px 2px}
+  .pz .tabs a.on{background:var(--card)}
+  .pz .pbody{
+    background:var(--card);
+    border:0;
+    border-top:1.5px solid var(--line);
+    border-radius:0;
+    padding:18px 24px;
+  }
+
+  @media(max-width:720px){
+    .pz .pbody{flex:none;height:380px;padding:14px 16px}
+    .pz .tabs{padding:0 12px 2px}
+  }
+
+  /* ===== Passport: tablar çərçivənin üstündə ===== */
+  .pz{margin-top:52px;overflow:visible}
+  .pz .rp{position:relative;padding:0}
+  .pz .tabs{
+    position:absolute;
+    bottom:calc(100% - 2px);
+    left:16px;right:16px;
+    margin:0;padding:0 0 2px;
+    overflow:visible;
+  }
+  .pz .pbody{border-top-right-radius:10px;padding:18px 24px}
+  .pz .mrz2{border-radius:0 0 10px 10px}
+
+  @media(max-width:720px){
+    .pz{margin-top:16px}
+    .pz .tabs{left:10px;right:10px;overflow-x:auto;overflow-y:hidden}
+    .pz .lp{padding-bottom:44px}
+    .pz .pbody{flex:none;height:380px;padding:14px 16px;border-radius:0}
   }
 }
