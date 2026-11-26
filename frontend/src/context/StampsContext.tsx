@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { useRef, createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import { api } from "../lib/api"
 import { useAuth } from "./AuthContext"
 
@@ -24,6 +24,7 @@ function nextStatus(currentStatus: CountryStatus | undefined): CountryStatus | "
 }
 
 export function StampsProvider({ children }: {children: ReactNode}) {
+  const pending = useRef<Set<string>>(new Set());
   const [allStamps, setAllStamps] = useState<StampMap>({});
   const { user, openSignIn } = useAuth();
 
@@ -63,27 +64,41 @@ export function StampsProvider({ children }: {children: ReactNode}) {
       openSignIn();
       return;
     }
-    const currentStatus = allStamps[code];
-    const newStatus = nextStatus(currentStatus);
-    const newStamps = {...allStamps}
+    if (pending.current.has(code)) return;
+    pending.current.add(code);
 
-    if (newStatus === "none") {
-      delete newStamps[code];
-    } else {
-      newStamps[code] = newStatus;
-    }
-    const oldStamps = allStamps;
-    setAllStamps(newStamps);
+    const oldStatus = allStamps[code];
+    const newStatus = nextStatus(oldStatus);
 
-    try{
+    setAllStamps((prev) => {
+      const next = { ...prev };
+      if (newStatus === "none") {
+        delete next[code];
+      } else {
+        next[code] = newStatus;
+      }
+      return next;
+    });
+
+    try {
       await api(`/countries/${code}/stamp`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({status: newStatus})
+        body: JSON.stringify({ status: newStatus }),
       });
-    } catch(err) {
+    } catch (err) {
       console.error(err);
-      setAllStamps(oldStamps);
+      setAllStamps((prev) => {
+        const next = { ...prev };
+        if (oldStatus === undefined) {
+          delete next[code];
+        } else {
+          next[code] = oldStatus;
+        }
+        return next;
+      });
+    } finally {
+      pending.current.delete(code);
     }
   }
 

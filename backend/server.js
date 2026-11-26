@@ -103,56 +103,39 @@ app.get('/countries/:code', async (req, res, next) => {
   }
 })
 
-app.put('/countries/:code/stamp', checkAuth, async(req, res, next) =>{
-  try{
-    let code = req.params.code;
-    const status = req.body.status;
-    const userId = req.user.id;
-    if (!/^[A-Za-z]{2}$/.test(code)) {
-      res.status(400).json({message: "Invalid code"});
-      return;
-    }
-    code = code.toUpperCase();
-    if (!["visited", "wishlist", "none"].includes(status)){
-      res.status(400).json({message: "Invalid status"});
-      return;
-    }
-    const country = await prisma.country.findUnique({where: { code }});
-    if (!country) {
-      res.status(404).json({message: "Not found"});
-      return;
-    } 
-    const countryId = country.id;
-    if (status === "visited") {
-      await prisma.$transaction([
-        prisma.wishlist.deleteMany({ where: {userId, countryId } }),
-        prisma.visited.upsert({
-          where: {userId_countryId: {userId, countryId}},
-          create: {userId, countryId},
-          update: {},
-        }),
-      ]);
-    } else if (status === "wishlist") {
-      await prisma.$transaction([
-        prisma.visited.deleteMany({ where: { userId, countryId } }),
-        prisma.wishlist.upsert({
-          where: {userId_countryId: {userId, countryId}},
-          create: {userId, countryId},
-          update: {},
-        }),
-      ]);
-    } else {
-      await prisma.$transaction([
-        prisma.wishlist.deleteMany({where: {userId, countryId}}),
-        prisma.visited.deleteMany({where: {userId, countryId}})
-      ])
-    }
-    res.json({ code, status });
+app.put('/countries/:code/stamp', checkAuth, async (req, res, next) => {
+  try {
+    const { code } = req.params;
+    const { status } = req.body;
 
-  } catch(error) {
+    if (!['visited', 'wishlist', 'none'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const country = await prisma.country.findUnique({ where: { code: code.toUpperCase() } });
+    if (!country) return res.status(404).json({ error: 'Country not found' });
+
+    const userId = req.user.id;
+    const countryId = country.id;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
+
+      await tx.visited.deleteMany({ where: { userId, countryId } });
+      await tx.wishlist.deleteMany({ where: { userId, countryId } });
+
+      if (status === 'visited') {
+        await tx.visited.create({ data: { userId, countryId } });
+      } else if (status === 'wishlist') {
+        await tx.wishlist.create({ data: { userId, countryId } });
+      }
+    });
+
+    res.json({ code: country.code, status });
+  } catch (error) {
     next(error);
   }
-})
+});
 
 app.put('/countries/:code/review', checkAuth, async(req, res, next) => {
   try{
