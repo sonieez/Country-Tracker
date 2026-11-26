@@ -694,6 +694,55 @@ app.get('/me/followers', checkAuth, async (req, res, next) => {
   }
 })
 
+const publicUserSelect = { id: true, displayName: true, username: true, profilePicture: true };
+
+app.get('/users/:id/followers', async (req, res, next) => {
+  try {
+    const rows = await prisma.follow.findMany({
+      where: { followingId: req.params.id },
+      include: { follower: { select: publicUserSelect } },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+    res.json(rows.map((r) => r.follower));
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.get('/users/:id/following', async (req, res, next) => {
+  try {
+    const rows = await prisma.follow.findMany({
+      where: { followerId: req.params.id },
+      include: { following: { select: publicUserSelect } },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+    res.json(rows.map((r) => r.following));
+  } catch (error) {
+    next(error);
+  }
+})
+
+app.get('/users/:id/lists', async (req, res, next) => {
+  try {
+    const lists = await prisma.lists.findMany({
+      where: { userId: req.params.id },
+      include: { listItem: { include: { country: true } } },
+      orderBy: { id: 'desc' },
+    });
+    res.json(
+      lists.map((list) => ({
+        id: list.id,
+        name: list.name,
+        countries: list.listItem.map((item) => item.country),
+      })),
+    );
+  } catch (error) {
+    next(error);
+  }
+})
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({message: 'Problem within the server'})
