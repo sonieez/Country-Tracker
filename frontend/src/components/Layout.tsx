@@ -33,6 +33,9 @@ export default function Layout() {
         <NavLink to="/countries" className={({ isActive }) => (isActive ? 'on' : '')}>
           Countries
         </NavLink>
+        <NavLink to="/users" className={({ isActive }) => (isActive ? 'on' : '')}>
+          People
+        </NavLink>
         <span className="sp"></span>
         <button
           className="round"

@@ -552,6 +552,37 @@ app.get('/countries/:code/people', async (req, res, next) => {
   }
 })
 
+app.get('/users', async (req, res, next) => {
+  try {
+    const search = req.query.search;
+    if (typeof search !== 'string') {
+      res.status(400).json({ message: "Invalid search" });
+      return;
+    }
+    const q = search.trim().replace(/^@/, '');
+    if (q.length < 2 || q.length > 40) {
+      res.json([]);
+      return;
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: q, mode: 'insensitive' } },
+          { displayName: { contains: q, mode: 'insensitive' } },
+        ],
+      },
+      select: { id: true, displayName: true, username: true, profilePicture: true },
+      orderBy: { displayName: 'asc' },
+      take: 20,
+    });
+
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+})
+
 app.get('/users/:id', async (req, res, next) => {
   try {
     const id = req.params.id;

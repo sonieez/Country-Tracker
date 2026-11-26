@@ -46,6 +46,20 @@ export default function Profile() {
   const { following } = useFollow();
   const [followers, setFollowers] = useState<typeof following | null>(null);
 
+  const [copied, setCopied] = useState(false);
+
+  async function copyLink() {
+    if (!data) return;
+    const url = `${window.location.origin}/users/${data.user.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      window.prompt("Copy your profile link:", url);
+    }
+  }
+
   useEffect(() => {
     if (tab !== "Followers" || !user) return;
     let oldRequest = false;
@@ -146,7 +160,12 @@ export default function Profile() {
               </div>
             </div>
 
-            <button className="fill sm follow" onClick={() => setEditOpen(true)}>Edit profile</button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+              <button className="fill sm" onClick={() => setEditOpen(true)}>Edit profile</button>
+              <button className="sm" onClick={copyLink}>
+                {copied ? "Link copied ✓" : "Copy link"}
+              </button>
+            </div>
           </div>
 
           <div className="rp">
@@ -204,7 +223,9 @@ export default function Profile() {
                   <>
                     <div className="hd"><h2>Following · {following.length}</h2></div>
                     {following.length === 0 ? (
-                      <div className="lempty">You don't follow anyone yet.</div>
+                      <div className="lempty">
+                        You don't follow anyone yet. <Link to="/users">Find travelers</Link>
+                      </div>
                     ) : (
                       <div className="two" style={{ marginTop: 14 }}>
                         {following.map((p) => (
