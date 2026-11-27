@@ -2,16 +2,30 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import checkAuth from './src/middleware/auth.js';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(express.json());
-
+app.set('trust proxy', 1); 
+app.use(helmet());
 app.use(cors({
   origin: ['http://localhost:5173', 'https://stampz-project.vercel.app']
 }))
+app.use(express.json({ limit: '10kb' }));
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many requests, try again later' },
+  })
+);
+
 
 app.get('/', (req, res) => {
   res.send("hello")
@@ -109,11 +123,11 @@ app.put('/countries/:code/stamp', checkAuth, async (req, res, next) => {
     const { status } = req.body;
 
     if (!['visited', 'wishlist', 'none'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
+      return res.status(400).json({ message: 'Invalid status' });
     }
 
     const country = await prisma.country.findUnique({ where: { code: code.toUpperCase() } });
-    if (!country) return res.status(404).json({ error: 'Country not found' });
+    if (!country) return res.status(404).json({ message: 'Country not found' });
 
     const userId = req.user.id;
     const countryId = country.id;
@@ -157,7 +171,11 @@ app.put('/countries/:code/review', checkAuth, async(req, res, next) => {
     }
 
     const code = req.params.code;
-    const country = await prisma.country.findUnique({where: {code}});
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      res.status(400).json({ message: "Invalid code" });
+      return;
+    }
+    const country = await prisma.country.findUnique({where: { code: code.toUpperCase() }});
     if (!country) {
       res.status(404).json({ message: "Not found" });
       return;
@@ -746,8 +764,12 @@ app.get('/users/:id/lists', async (req, res, next) => {
 // Mənim şəhərlərim (bu ölkədə)
 app.get('/countries/:code/cities', checkAuth, async (req, res, next) => {
   try {
-    const country = await prisma.country.findUnique({ where: { code: req.params.code } });
-    if (!country) return res.status(404).json({ error: 'Country not found' });
+    const code = req.params.code;
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      return res.status(400).json({ message: 'Invalid code' });
+    }
+    const country = await prisma.country.findUnique({ where: { code: code.toUpperCase() } });
+    if (!country) return res.status(404).json({ message: 'Country not found' });
 
     const cities = await prisma.city.findMany({
       where: { userId: req.user.id, countryId: country.id },
@@ -765,24 +787,28 @@ app.post('/countries/:code/cities', checkAuth, async (req, res, next) => {
     const { name, lat, lng, status } = req.body;
 
     if (typeof name !== 'string' || name.trim().length < 1 || name.trim().length > 60) {
-      return res.status(400).json({ error: 'Name must be 1-60 characters' });
+      return res.status(400).json({ message: 'Name must be 1-60 characters' });
     }
     if (typeof lat !== 'number' || typeof lng !== 'number' ||
         lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      return res.status(400).json({ error: 'Invalid coordinates' });
+      return res.status(400).json({ message: 'Invalid coordinates' });
     }
     if (status !== 'visited' && status !== 'wishlist') {
-      return res.status(400).json({ error: 'Status must be visited or wishlist' });
+      return res.status(400).json({ message: 'Status must be visited or wishlist' });
     }
 
-    const country = await prisma.country.findUnique({ where: { code: req.params.code } });
-    if (!country) return res.status(404).json({ error: 'Country not found' });
+    const code = req.params.code;
+    if (!/^[A-Za-z]{2}$/.test(code)) {
+      return res.status(400).json({ message: 'Invalid code' });
+    }
+    const country = await prisma.country.findUnique({ where: { code: code.toUpperCase() } });
+    if (!country) return res.status(404).json({ message: 'Country not found' });
 
     const count = await prisma.city.count({
       where: { userId: req.user.id, countryId: country.id },
     });
     if (count >= 50) {
-      return res.status(400).json({ error: 'Max 50 cities per country' });
+      return res.status(400).json({ message: 'Max 50 cities per country' });
     }
 
     const city = await prisma.city.create({
@@ -798,12 +824,12 @@ app.post('/countries/:code/cities', checkAuth, async (req, res, next) => {
 app.delete('/cities/:id', checkAuth, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid id' });
+    if (!Number.isInteger(id)) return res.status(400).json({ message: 'Invalid id' });
 
     const result = await prisma.city.deleteMany({
       where: { id, userId: req.user.id },
     });
-    if (result.count === 0) return res.status(404).json({ error: 'City not found' });
+    if (result.count === 0) return res.status(404).json({ message: 'City not found' });
 
     res.json({ ok: true });
   } catch (error) {
@@ -811,10 +837,27 @@ app.delete('/cities/:id', checkAuth, async (req, res, next) => {
   }
 });
 
+// Naməlum marşrut
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not found' });
+});
+
+// Mərkəzi error handler
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({message: 'Problem within the server'})
-})
+
+  // Səhv JSON body
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ message: 'Invalid JSON' });
+  }
+  // Çox böyük body
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'Request too large' });
+  }
+
+  const message = process.env.NODE_ENV === 'production' ? 'Server error' : err.message;
+  res.status(500).json({ message: message });
+});
 
 
 app.listen(PORT, () => {
