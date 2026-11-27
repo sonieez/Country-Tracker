@@ -26,6 +26,7 @@ model User {
   wishlist        Wishlist[]
   reviews         Reviews[]
   lists           Lists[]
+  cities          City[]
 
   following       Follow[] @relation("Following")
   followers       Follow[] @relation("Followers")
@@ -41,6 +42,23 @@ model Country {
   wishlist  Wishlist[]
   reviews   Reviews[]
   listItem  ListItem[]
+  cities    City[]
+}
+
+model City {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  countryId Int
+  name      String
+  lat       Float
+  lng       Float
+  status    String   
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id])
+  country   Country @relation(fields: [countryId], references: [id])
+
+  @@index([userId, countryId])
 }
 
 model Visited {

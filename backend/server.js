@@ -743,6 +743,74 @@ app.get('/users/:id/lists', async (req, res, next) => {
   }
 })
 
+// Mənim şəhərlərim (bu ölkədə)
+app.get('/countries/:code/cities', checkAuth, async (req, res, next) => {
+  try {
+    const country = await prisma.country.findUnique({ where: { code: req.params.code } });
+    if (!country) return res.status(404).json({ error: 'Country not found' });
+
+    const cities = await prisma.city.findMany({
+      where: { userId: req.user.id, countryId: country.id },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(cities);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Şəhər əlavə et
+app.post('/countries/:code/cities', checkAuth, async (req, res, next) => {
+  try {
+    const { name, lat, lng, status } = req.body;
+
+    if (typeof name !== 'string' || name.trim().length < 1 || name.trim().length > 60) {
+      return res.status(400).json({ error: 'Name must be 1-60 characters' });
+    }
+    if (typeof lat !== 'number' || typeof lng !== 'number' ||
+        lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ error: 'Invalid coordinates' });
+    }
+    if (status !== 'visited' && status !== 'wishlist') {
+      return res.status(400).json({ error: 'Status must be visited or wishlist' });
+    }
+
+    const country = await prisma.country.findUnique({ where: { code: req.params.code } });
+    if (!country) return res.status(404).json({ error: 'Country not found' });
+
+    const count = await prisma.city.count({
+      where: { userId: req.user.id, countryId: country.id },
+    });
+    if (count >= 50) {
+      return res.status(400).json({ error: 'Max 50 cities per country' });
+    }
+
+    const city = await prisma.city.create({
+      data: { userId: req.user.id, countryId: country.id, name: name.trim(), lat, lng, status },
+    });
+    res.status(201).json(city);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Şəhəri sil (yalnız sahibi)
+app.delete('/cities/:id', checkAuth, async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid id' });
+
+    const result = await prisma.city.deleteMany({
+      where: { id, userId: req.user.id },
+    });
+    if (result.count === 0) return res.status(404).json({ error: 'City not found' });
+
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({message: 'Problem within the server'})

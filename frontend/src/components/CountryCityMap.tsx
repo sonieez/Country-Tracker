@@ -37,6 +37,16 @@ function ClickHandler({ onPick }: { onPick: (lat: number, lng: number) => void }
   });
   return null;
 }
+// Xəritəni seçilən yerə uçurur
+function FlyTo({ target }: { target: Picked | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo([target.lat, target.lng], 10);
+  }, [target, map]);
+  return null;
+}
+
+type SearchResult = { lat: string; lon: string; name: string; display_name: string };
 
 export default function CountryCityMap({ code }: { code: string }) {
   const { user, openSignIn } = useAuth();
@@ -50,6 +60,11 @@ export default function CountryCityMap({ code }: { code: string }) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const lookupId = useRef(0);
+
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [flyTarget, setFlyTarget] = useState<Picked | null>(null);
 
   // Ölkənin sərhədi
   useEffect(() => {
@@ -145,12 +160,71 @@ export default function CountryCityMap({ code }: { code: string }) {
     }
   }
 
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    setSearching(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&countrycodes=${code.toLowerCase()}&limit=5&accept-language=en`
+      );
+      const data: SearchResult[] = await res.json();
+      setResults(data);
+      if (data.length === 0) setError('No place found in this country.');
+    } catch {
+      setError('Search failed. Try again.');
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  function choose(r: SearchResult) {
+    if (!user) {
+      openSignIn();
+      return;
+    }
+    const lat = parseFloat(r.lat);
+    const lng = parseFloat(r.lon);
+    lookupId.current++; // gözləyən klik sorğusunu ləğv edir
+    setLookingUp(false);
+    setPicked({ lat, lng });
+    setName(r.name || r.display_name.split(',')[0]);
+    setFlyTarget({ lat, lng });
+    setResults([]);
+    setError(null);
+  }
+
   return (
     <section className="mt-8">
       <h2 className="text-xl font-bold mb-2">Cities</h2>
       <p className="text-sm opacity-70 mb-3">
         Click on the map to mark a city you visited or want to visit.
       </p>
+
+      <form onSubmit={handleSearch} className="mb-3 flex gap-2">
+        <input
+          className="border rounded px-2 py-1 flex-1"
+          placeholder="Search a city (e.g. Tartu)"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <button type="submit" disabled={searching}>
+          {searching ? 'Searching…' : 'Search'}
+        </button>
+      </form>
+      {results.length > 0 && (
+        <ul className="mb-3 border rounded divide-y">
+          {results.map((r, i) => (
+            <li key={i}>
+              <button type="button" className="w-full text-left px-3 py-2" onClick={() => choose(r)}>
+                {r.display_name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div style={{ height: 380 }} className="rounded-xl overflow-hidden border">
         <MapContainer center={[20, 0]} zoom={2} style={{ height: '100%', width: '100%' }}>
@@ -169,6 +243,7 @@ export default function CountryCityMap({ code }: { code: string }) {
             </>
           )}
           <ClickHandler onPick={handlePick} />
+          <FlyTo target={flyTarget} />
           {cities.map((c) => (
             <Marker key={c.id} position={[c.lat, c.lng]} icon={pinIcon(COLORS[c.status])} />
           ))}
