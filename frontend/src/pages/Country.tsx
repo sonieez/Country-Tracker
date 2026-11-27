@@ -7,6 +7,7 @@ import Reviews from '../components/Reviews'
 import AddToListButton from '../components/AddToListButton'
 import CountryPeople from '../components/CountryPeople'
 import CountryLocationMap from '../components/CountryLocationMap'
+import CountryCityMap from '../components/CountryCityMap'
 
 
 export default function CountryPage() {
@@ -89,6 +90,8 @@ export default function CountryPage() {
           visitedCount={country.visitedCount ?? 0}
           wishlistCount={country.wishlistCount ?? 0}
         />
+
+        <CountryCityMap code={country.code} />
 
         <Reviews code={country.code} onReviewsChanged={() => setReloadKey((k) => k + 1)} />
       </>
