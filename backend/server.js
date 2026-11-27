@@ -19,7 +19,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 300,
+    limit: 600,
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: 'Too many requests, try again later' },

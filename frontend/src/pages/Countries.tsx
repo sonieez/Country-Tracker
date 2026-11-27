@@ -16,6 +16,14 @@ export default function Countries() {
   const [activeCode, setActiveCode] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "visited" | "wishlist" | "none">('all');
   const { stamps } = useStamps();
+
+  const PAGE_SIZE = 50;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Axtarış, filtr və ya sıralama dəyişəndə yenidən ilk 50-dən başla
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchInput, filter, sort]);
   
   useEffect(() => {
     let oldRequest = false;
@@ -103,11 +111,21 @@ export default function Countries() {
 
       {loading ? <p>Loading...</p> : error ? <p>{error}</p> :
         view === 'list' ? (sortedCountries.length === 0 ? <p>No countries match</p> :
-        <div className="tks" style={{ marginTop: 16 }}>
-          {sortedCountries.map((c) => (
-            <TicketCard key={c.id} country={c} />
-          ))}
-        </div>) :
+          <>
+            <div className="tks" style={{ marginTop: 16 }}>
+              {sortedCountries.slice(0, visibleCount).map((c) => (
+                <TicketCard key={c.id} country={c} />
+              ))}
+            </div>
+            {visibleCount < sortedCountries.length && (
+              <button
+                style={{ display: 'block', margin: '24px auto' }}
+                onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+              >
+                Show more ({sortedCountries.length - visibleCount} left)
+              </button>
+            )}
+          </>) :
         <div className="mapw">
           <WorldMap activeCode={activeCode} onSelect={setActiveCode} />
           <aside className="box side">
